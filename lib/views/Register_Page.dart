@@ -97,40 +97,6 @@ class _RegisterState extends State<Register> {
                   height: 8.0,
                 ),
                 Row(
-                  children: [
-                    Expanded(
-                        child: TextField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        hintText: "Phone",
-                      ),
-                    ))
-                  ],
-                ),
-                const SizedBox(
-                  height: 8.0,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                        child: TextField(
-                      keyboardType: TextInputType.streetAddress,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        hintText: "Address",
-                      ),
-                    ))
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(

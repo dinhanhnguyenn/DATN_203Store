@@ -1,3 +1,5 @@
+import 'package:app_203store/views/Cart_Page.dart';
+import 'package:app_203store/views/Payment_Page.dart';
 import 'package:flutter/material.dart';
 
 class DetailProduct extends StatefulWidget {
@@ -38,7 +40,9 @@ class _DetailProductState extends State<DetailProduct> {
           Expanded(
             child: MaterialButton(
               color: const Color(0xFF8E8E8E),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const Cart()));
+              },
               child: Container(
                 alignment: Alignment.center,
                 height: 70,
@@ -58,7 +62,9 @@ class _DetailProductState extends State<DetailProduct> {
           Expanded(
             child: MaterialButton(
               color: Colors.red,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const Payment()));
+              },
               child: Container(
                 alignment: Alignment.center,
                 height: 70,

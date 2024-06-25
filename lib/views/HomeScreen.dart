@@ -1,4 +1,5 @@
 import 'package:app_203store/models/CategoriesItem.dart';
+import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/DetailProduct.dart';
 import 'package:app_203store/views/SearchScreen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -73,7 +74,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   color: Colors.transparent,
                   child: IconButton(
-                    onPressed: (){},
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const Cart()));
+                    },
                     icon: const Icon(
                       Icons.shopping_cart_outlined,
                       color: Colors.black,

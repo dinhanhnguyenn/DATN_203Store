@@ -1,7 +1,11 @@
+import 'package:app_203store/views/AccountScreen.dart';
 import 'package:app_203store/views/AddProduct_Page.dart';
 import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/ForgetPass_Page.dart';
+import 'package:app_203store/views/HomeScreen.dart';
 import 'package:app_203store/views/Login_Page.dart';
+import 'package:app_203store/views/MainScreen.dart';
+import 'package:app_203store/views/NotificationsScreen.dart';
 import 'package:app_203store/views/Payment_Page.dart';
 import 'package:app_203store/views/Register_Page.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +20,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(debugShowCheckedModeBanner: false, home: Cart());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white
+      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const MainScreen(),
+        '/home':(context) => const HomeScreen(),
+        '/notifi':(context) => const NotificationsScreen(),
+        '/profile': (context) => const AccountScreen()
+      },
+    );
   }
 }

@@ -15,7 +15,9 @@ class _CartState extends State<Cart> {
       appBar: AppBar(
         backgroundColor: Colors.lightBlue[200],
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
           icon: Icon(Icons.arrow_back),
         ),
         title: Text("Giỏ Hàng"),

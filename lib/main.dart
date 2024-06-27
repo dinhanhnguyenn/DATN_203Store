@@ -1,4 +1,5 @@
 import 'package:app_203store/views/AccountScreen.dart';
+import 'package:app_203store/views/AddProductScreen.dart';
 import 'package:app_203store/views/AddProduct_Page.dart';
 import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/ForgetPass_Page.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const MainScreen(),
+        // '/':(context) => const AddProductsScreen(),
         '/home':(context) => const HomeScreen(),
         '/notifi':(context) => const NotificationsScreen(),
         '/profile': (context) => const AccountScreen()

@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:app_203store/models/CategoriesItem.dart';
 import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/DetailProduct.dart';
 import 'package:app_203store/views/SearchScreen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -132,77 +135,105 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                  ),
-                  itemCount: 10,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DetailProduct(),
+
+            FutureBuilder(
+              future: fetchData(),
+              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No data available'));
+                } else {
+                  List<dynamic> productList = snapshot.data!;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GridView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 8.0,
+                        mainAxisSpacing: 8.0,
+                      ),
+                      itemCount: productList.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailProduct(),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            color: const Color(0xFFD9D9D9),
+                            elevation: 7.0,
+                            child: ListTile(
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Expanded(
+                    
+                                    child: Center(
+                                      child: Image.network(
+                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      "${productList[index]["name"]}",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+
+                                  Padding(
+                                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                                    child: Text(
+                                      ' ${productList[index]["price"]} VND',
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         );
                       },
-                      child: Card(
-                        color: const Color(0xFFD9D9D9),
-                        elevation: 7.0,
-                        child: ListTile(
-                          subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  height: 120,
-                                  width: 120,
-                                  child: Image.asset(
-                                    "assets/5.jpg",
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 17,
-                              ),
-                              textAlign: TextAlign.center
-                            ),
-                            Text(
-                              ' ${price.toString()} VND',
-                              style: const TextStyle(
-                                color: Colors.red,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center
-                            ),
-                          ],
-                        )),
-                      )
-                    );
-                  },
-                ),
-              ),
+                    ),
+                  );
+                }
+              },
             )
           ],
         ),
       ),
     );
   }
+
+  Future<List> fetchData() async {
+    final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadProduct.php'));
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
 }
+

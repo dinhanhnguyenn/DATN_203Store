@@ -1,4 +1,7 @@
+import 'package:app_203store/views/Login_Page.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -8,6 +11,47 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  Future<void> register() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Mật khẩu không khớp')),
+      );
+      return;
+    }
+
+    final response = await http.post(
+      Uri.parse('http://192.168.1.5/register.php'),
+      body: {
+        'email': email,
+        'password': password,
+      },
+    );
+
+    final data = jsonDecode(response.body);
+    if (data['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đăng ký thành công')),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(data['message'])),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,6 +93,7 @@ class _RegisterState extends State<Register> {
                   children: [
                     Expanded(
                         child: TextField(
+                      controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -66,6 +111,8 @@ class _RegisterState extends State<Register> {
                   children: [
                     Expanded(
                         child: TextField(
+                      controller: _passwordController,
+                      obscureText: true,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -83,6 +130,8 @@ class _RegisterState extends State<Register> {
                   children: [
                     Expanded(
                         child: TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -107,7 +156,7 @@ class _RegisterState extends State<Register> {
                           padding: const EdgeInsets.symmetric(
                               vertical: 15, horizontal: 40),
                           backgroundColor: Colors.lightBlue[200]),
-                      onPressed: () {},
+                      onPressed: register,
                       child: const Text(
                         "Đăng Ký",
                         style: TextStyle(fontSize: 16, color: Colors.white),

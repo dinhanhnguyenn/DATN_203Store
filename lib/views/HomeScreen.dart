@@ -147,7 +147,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Center(child: Text('No data available'));
                 } else {
                   List<dynamic> productList = snapshot.data!;
-
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GridView.builder(
@@ -165,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => DetailProduct(),
+                                builder: (context) => DetailProduct(product: productList[index]),
                               ),
                             );
                           },
@@ -173,8 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: const Color(0xFFD9D9D9),
                             elevation: 7.0,
                             child: ListTile(
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              subtitle: Column(               
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Expanded(
@@ -197,7 +195,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
-
                                   Padding(
                                       padding: const EdgeInsets.only(top: 5,bottom: 5),
                                     child: Text(
@@ -232,8 +229,10 @@ class _HomeScreenState extends State<HomeScreen> {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to load data');
+      throw Exception('Load thất bại');
     }
   }
+
+
 }
 

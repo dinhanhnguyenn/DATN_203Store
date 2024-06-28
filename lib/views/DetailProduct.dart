@@ -1,16 +1,20 @@
-
+import 'dart:convert';
+import 'package:app_203store/models/Product.dart';
 import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/Payment_Page.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class DetailProduct extends StatefulWidget {
-  const DetailProduct({super.key});
-
+   DetailProduct({super.key, required this.product});
+   var product;
   @override
   State<DetailProduct> createState() => _DetailProductState();
 }
 
 class _DetailProductState extends State<DetailProduct> {
+
+  
 
   final List<String> color = [
     'Vàng',
@@ -104,8 +108,8 @@ class _DetailProductState extends State<DetailProduct> {
               children: [
                 Stack(
                   children: [
-                    Image.asset(
-                      "assets/5.jpg",
+                    Image.network(
+                       "http://192.168.1.6/flutter/uploads/${widget.product["image"]}",
                       height: 300,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -131,17 +135,17 @@ class _DetailProductState extends State<DetailProduct> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "iPhone 15 PROMAX VN 512GB",
-                        style: TextStyle(
+                      Text(
+                        '${widget.product["name"]}',
+                        style: const TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      const Text(
-                        "35.000.000 VND",
-                        style: TextStyle(
+                      Text(
+                         ' ${widget.product["price"]} VND',
+                        style: const TextStyle(
                           fontSize: 18.0,
                           color: Colors.red,
                         ),
@@ -184,7 +188,7 @@ class _DetailProductState extends State<DetailProduct> {
                       const SizedBox(
                         height: 20.0,
                       ),
-                      const Text('Chính sách bảo hành',
+                      const Text('Mô tả sản phẩm',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15.0
@@ -196,12 +200,14 @@ class _DetailProductState extends State<DetailProduct> {
                             color: const Color(0XFFD9D9D9),
                             borderRadius: BorderRadius.circular(15)
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(8.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Bảo hành 24 tháng")
+                                Text(
+                                  '${widget.product["description"]}'
+                                )
                               ],
                             ),
                           )),
@@ -218,4 +224,5 @@ class _DetailProductState extends State<DetailProduct> {
       ),
     );
   }
+
 }

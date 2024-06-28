@@ -1,8 +1,12 @@
+import 'package:app_203store/views/AccountScreen.dart';
+import 'package:app_203store/views/AddProductScreen.dart';
 import 'package:app_203store/views/AddProduct_Page.dart';
-import 'package:app_203store/views/Oder_Page.dart';
+import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/ForgetPass_Page.dart';
 import 'package:app_203store/views/HomeScreen.dart';
 import 'package:app_203store/views/Login_Page.dart';
+import 'package:app_203store/views/MainScreen.dart';
+import 'package:app_203store/views/NotificationsScreen.dart';
 import 'package:app_203store/views/Payment_Page.dart';
 import 'package:app_203store/views/Register_Page.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +27,11 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginPage(),
         '/register': (context) => Register(),
-        '/home':(context)=>HomeScreen(),
+        '/': (context) => const MainScreen(),
+        // '/':(context) => const AddProductsScreen(),
+        '/home':(context) => const HomeScreen(),
+        '/notifi':(context) => const NotificationsScreen(),
+        '/profile': (context) => const AccountScreen()
       },
     );
   }

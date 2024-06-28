@@ -15,7 +15,9 @@ class _PaymentState extends State<Payment> {
         backgroundColor: Colors.lightBlue[200],
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         title:
             Text('Thanh Toán', style: TextStyle(fontWeight: FontWeight.bold)),

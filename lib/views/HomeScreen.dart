@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'package:app_203store/models/CategoriesItem.dart';
+import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/DetailProduct.dart';
 import 'package:app_203store/views/SearchScreen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   final String name = "Iphone 15 ProMax";
   final String price = "35.000.000";
 
@@ -28,54 +32,64 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.lightBlue[200],
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 7.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "203 Store",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                          color: Colors.blue),
-                    ),
-                  ],
-                ),
-              ),
-              Row(
+        backgroundColor: Colors.lightBlue[200],
+        title:Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(left: 7.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    color: Colors.transparent,
-                    child: IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const SearchScreen()));
-                        },
-                        icon: const Icon(
-                          Icons.search,
-                          color: Colors.black,
-                        )),
+                  Text(
+                    "203 Store",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                      color: Colors.blue
+                    ),
                   ),
-                  Container(
-                    color: Colors.transparent,
-                    child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.shopping_cart_outlined,
-                          color: Colors.black,
-                        )),
+                  Text(
+                    "Cung cấp các sản phẩm Apple chính hãng",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13
+                    ),
                   )
                 ],
-              )
-            ],
-          )),
+              ),
+            ),
+            Row(
+              children: [
+                Container(
+                  color: Colors.transparent,
+                  child: IconButton(
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchScreen()));
+                    },
+                    icon: const Icon(
+                      Icons.search,
+                      color: Colors.black,
+                    )
+                  ),
+                ),
+                Container(
+                  color: Colors.transparent,
+                  child: IconButton(
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) =>  Cart()));
+                    },
+                    icon: const Icon(
+                      Icons.shopping_cart_outlined,
+                      color: Colors.black,
+                    )
+                  ),
+                )
+              ],
+            )
+          ],
+        )
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -92,7 +106,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   autoPlayInterval: const Duration(seconds: 3),
                   autoPlayAnimationDuration: const Duration(milliseconds: 800),
                   autoPlayCurve: Curves.fastOutSlowIn,
-                  onPageChanged: (index, reason) {},
+                  onPageChanged: (index, reason) {
+                    
+                  },
                 ),
                 items: imagelist.map((imagePath) {
                   return Builder(
@@ -117,75 +133,105 @@ class _HomeScreenState extends State<HomeScreen> {
                 }).toList(),
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                  ),
-                  itemCount: 10,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const DetailProduct(),
-                            ),
-                          );
-                        },
-                        child: Card(
-                          color: Colors.white,
-                          shadowColor: Colors.black,
-                          elevation: 7.0,
-                          child: ListTile(
+            const SizedBox(height: 20),
+
+            FutureBuilder(
+              future: fetchData(),
+              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No data available'));
+                } else {
+                  List<dynamic> productList = snapshot.data!;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GridView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 8.0,
+                        mainAxisSpacing: 8.0,
+                      ),
+                      itemCount: productList.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailProduct(),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            color: const Color(0xFFD9D9D9),
+                            elevation: 7.0,
+                            child: ListTile(
                               subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  SizedBox(
-                                    height: 90,
-                                    width: 90,
-                                    child: Image.asset(
-                                      "assets/5.jpg",
-                                      fit: BoxFit.cover,
+                                  Expanded(
+                    
+                                    child: Center(
+                                      child: Image.network(
+                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      "${productList[index]["name"]}",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+
+                                  Padding(
+                                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                                    child: Text(
+                                      ' ${productList[index]["price"]} VND',
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
                                 ],
                               ),
-                              Text(name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17,
-                                  ),
-                                  textAlign: TextAlign.center),
-                              Text(' ${price.toString()} VND',
-                                  style: const TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  textAlign: TextAlign.center),
-                            ],
-                          )),
-                        ));
-                  },
-                ),
-              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+              },
             )
           ],
         ),
       ),
     );
+  }
+
+  Future<List> fetchData() async {
+    final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadProduct.php'));
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load data');
+    }
   }
 }

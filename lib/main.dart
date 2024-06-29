@@ -1,6 +1,5 @@
 import 'package:app_203store/views/AccountScreen.dart';
 import 'package:app_203store/views/AddProductScreen.dart';
-import 'package:app_203store/views/AddProduct_Page.dart';
 import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/ForgetPass_Page.dart';
 import 'package:app_203store/views/HomeScreen.dart';
@@ -23,15 +22,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
+      initialRoute: '/addproduct',
       routes: {
         '/login': (context) => LoginPage(),
         '/register': (context) => Register(),
         '/': (context) => const MainScreen(),
         // '/':(context) => const AddProductsScreen(),
-        '/home':(context) => const HomeScreen(),
-        '/notifi':(context) => const NotificationsScreen(),
-        '/profile': (context) => const AccountScreen()
+        '/home': (context) => const HomeScreen(),
+        '/notifi': (context) => const NotificationsScreen(),
+        '/profile': (context) => const AccountScreen(),
+        '/addproduct': (context) => const AddProductsScreen()
       },
     );
   }

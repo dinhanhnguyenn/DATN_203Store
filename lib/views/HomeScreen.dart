@@ -14,8 +14,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final String name = "Iphone 15 ProMax";
-  final String price = "35.000.000";
 
   final List<String> imagelist = [
     "assets/1.jpg",
@@ -31,62 +29,64 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.lightBlue[200],
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 7.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "203 Store",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                          color: Colors.blue),
-                    ),
-                    Text(
-                      "Cung cấp các sản phẩm Apple chính hãng",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                    )
-                  ],
-                ),
-              ),
-              Row(
+        backgroundColor: Colors.lightBlue[200],
+        title:Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(left: 7.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    color: Colors.transparent,
-                    child: IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const SearchScreen()));
-                        },
-                        icon: const Icon(
-                          Icons.search,
-                          color: Colors.black,
-                        )),
+                  Text(
+                    "203 Store",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                      color: Colors.blue
+                    ),
                   ),
-                  Container(
-                    color: Colors.transparent,
-                    child: IconButton(
-                        onPressed: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => Cart()));
-                        },
-                        icon: const Icon(
-                          Icons.shopping_cart_outlined,
-                          color: Colors.black,
-                        )),
+                  Text(
+                    "Cung cấp các sản phẩm Apple chính hãng",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13
+                    ),
                   )
                 ],
-              )
-            ],
-          )),
+              ),
+            ),
+            Row(
+              children: [
+                Container(
+                  color: Colors.transparent,
+                  child: IconButton(
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchScreen()));
+                    },
+                    icon: const Icon(
+                      Icons.search,
+                      color: Colors.black,
+                    )
+                  ),
+                ),
+                Container(
+                  color: Colors.transparent,
+                  child: IconButton(
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) =>  Cart()));
+                    },
+                    icon: const Icon(
+                      Icons.shopping_cart_outlined,
+                      color: Colors.black,
+                    )
+                  ),
+                )
+              ],
+            )
+          ],
+        )
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -103,7 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   autoPlayInterval: const Duration(seconds: 3),
                   autoPlayAnimationDuration: const Duration(milliseconds: 800),
                   autoPlayCurve: Curves.fastOutSlowIn,
-                  onPageChanged: (index, reason) {},
+                  onPageChanged: (index, reason) {
+                    
+                  },
                 ),
                 items: imagelist.map((imagePath) {
                   return Builder(
@@ -129,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
+
             FutureBuilder(
               future: fetchData(),
               builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
@@ -144,8 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: GridView.builder(
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 8.0,
                         mainAxisSpacing: 8.0,
@@ -158,8 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    DetailProduct(product: productList[index]),
+                                builder: (context) => DetailProduct(product: productList[index]),
                               ),
                             );
                           },
@@ -167,13 +168,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: const Color(0xFFD9D9D9),
                             elevation: 7.0,
                             child: ListTile(
-                              subtitle: Column(
+                              subtitle: Column(               
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Expanded(
+                    
                                     child: Center(
                                       child: Image.network(
-                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.30.103/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -190,8 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 5, bottom: 5),
+                                      padding: const EdgeInsets.only(top: 5,bottom: 5),
                                     child: Text(
                                       ' ${productList[index]["price"]} VND',
                                       style: const TextStyle(
@@ -220,8 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<List> fetchData() async {
-    final response =
-        await http.get(Uri.parse('http://192.168.1.6/flutter/loadProduct.php'));
+    final response = await http.get(Uri.parse('http://192.168.30.103/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

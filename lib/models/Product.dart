@@ -6,6 +6,7 @@ class Product {
   String price;
   String category_id;
   String description;
+  String status;
   
   Product(
     {
@@ -15,7 +16,8 @@ class Product {
       required this.price,
       required this.quantity,
       required this.description,
-      required this.category_id
+      required this.category_id,
+      required this.status
     }
   );
 }

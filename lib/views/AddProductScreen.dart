@@ -15,7 +15,7 @@ class AddProductsScreen extends StatefulWidget {
 class _AddProductsScreenState extends State<AddProductsScreen> {
 
   Product newproduct =
-      Product(product_id: "", name: "", quantity: "", image: "", price: "", category_id: "", description: "");
+      Product(product_id: "", name: "", quantity: "", image: "", price: "", category_id: "", description: "", status: "");
   var tensp = TextEditingController();
   var soluongsp = TextEditingController();
   var dongiasp = TextEditingController();
@@ -47,7 +47,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center, 
             children: [
@@ -66,7 +66,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 2,
                         blurRadius: 5,
-                        offset: Offset(0, 3),
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
@@ -158,13 +158,13 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
               ),
               TextField(
                 controller: mota,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0)),
                   focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black)),
-                  prefixIcon: const Icon(Icons.price_change),
+                  prefixIcon: const Icon(Icons.description_outlined),
                 ),
               ),
               const SizedBox(
@@ -194,7 +194,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                       borderRadius: BorderRadius.circular(10.0)),
                   focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black)),
-                  prefixIcon: const Icon(Icons.class_),
+                  prefixIcon: const Icon(Icons.numbers_sharp),
                 ),
               ),
               const SizedBox(
@@ -224,7 +224,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                       borderRadius: BorderRadius.circular(10.0)),
                   focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black)),
-                  prefixIcon: const Icon(Icons.price_change),
+                  prefixIcon: const Icon(Icons.category_outlined),
                 ),
               ),
               const SizedBox(
@@ -242,7 +242,8 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                         price: dongiasp.text,
                         quantity: soluongsp.text,
                         category_id: loai.text,
-                        description: mota.text
+                        description: mota.text,
+                        status: 1.toString()
                       );
                        productAdd(add);
                     },
@@ -271,13 +272,14 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
 }
 
 Future productAdd(Product pro) async {
-    final uri = Uri.parse('http://192.168.1.6/flutter/addProduct.php');
+    final uri = Uri.parse('http://192.168.1.3/flutter/addProduct.php');
     var request = http.MultipartRequest('POST', uri);
     request.fields['name'] = pro.name;
     request.fields['quantity'] = pro.quantity;
     request.fields['price'] = pro.price;
     request.fields['category_id'] = pro.category_id;
     request.fields['description'] = pro.description;
+    request.fields['status'] = 1.toString();
     print(pro.image);
 
     if (pro.image.isNotEmpty) {

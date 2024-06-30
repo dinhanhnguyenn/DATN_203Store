@@ -22,16 +22,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      initialRoute: '/cart',
       routes: {
         '/login': (context) => LoginPage(),
         '/register': (context) => Register(),
         '/': (context) => const MainScreen(),
-        // '/':(context) => const AddProductsScreen(),
         '/home': (context) => const HomeScreen(),
         '/notifi': (context) => const NotificationsScreen(),
         '/profile': (context) => const AccountScreen(),
-        '/addproduct': (context) => const AddProductsScreen()
+        '/addproduct': (context) => const AddProductsScreen(),
+        '/cart': (context) => const Cart(),
       },
     );
   }

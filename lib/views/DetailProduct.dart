@@ -1,21 +1,18 @@
 import 'dart:convert';
-import 'package:app_203store/models/Product.dart';
 import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/Payment_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class DetailProduct extends StatefulWidget {
-   DetailProduct({super.key, required this.product});
-   var product;
+  DetailProduct({Key? key, required this.product}) : super(key: key);
+  final Map<String, dynamic> product;
+
   @override
   State<DetailProduct> createState() => _DetailProductState();
 }
 
 class _DetailProductState extends State<DetailProduct> {
-
-  
-
   final List<String> color = [
     'Vàng',
     'Xanh lá',
@@ -24,15 +21,43 @@ class _DetailProductState extends State<DetailProduct> {
     'Hồng',
   ];
 
+  Future<void> addToCart() async {
+    final url = Uri.parse('http://192.168.50.111/flutter/add_to_cart.php');
+    try {
+      final response = await http.post(url, body: {
+        'product_id': widget.product['product_id'].toString(),
+        'price': widget.product["price"].toString(),
+      });
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'success') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Cart()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to add to cart')),
+          );
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to connect')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: (){},
-        child: Icon(
-          Icons.phone_in_talk, 
-          color: Colors.white
-        ),
+        onPressed: () {},
+        child: Icon(Icons.phone_in_talk, color: Colors.white),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
@@ -45,10 +70,7 @@ class _DetailProductState extends State<DetailProduct> {
           Expanded(
             child: MaterialButton(
               color: const Color(0xFF8E8E8E),
-              onPressed: () {
-                Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Cart()));
-              },
+              onPressed: addToCart,
               child: Container(
                 alignment: Alignment.center,
                 height: 70,
@@ -56,12 +78,11 @@ class _DetailProductState extends State<DetailProduct> {
                   child: Text(
                     'Thêm vào giỏ hàng',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15
-                    ),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15),
                   ),
-                )
+                ),
               ),
             ),
           ),
@@ -69,7 +90,8 @@ class _DetailProductState extends State<DetailProduct> {
             child: MaterialButton(
               color: Colors.red,
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const Payment()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Payment()));
               },
               child: Container(
                 alignment: Alignment.center,
@@ -80,17 +102,13 @@ class _DetailProductState extends State<DetailProduct> {
                     Text(
                       'MUA NGAY',
                       style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17
-                      ),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17),
                     ),
                     Text(
                       'Giao tận nơi',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ],
                 ),
@@ -109,24 +127,23 @@ class _DetailProductState extends State<DetailProduct> {
                 Stack(
                   children: [
                     Image.network(
-                       "http://192.168.72.181/flutter/uploads/${widget.product["image"]}",
+                      "http://192.168.50.111/flutter/uploads/${widget.product["image"]}",
                       height: 300,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
                     Positioned(
-                      top: 8.0,
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.black,
-                          size: 24.0,
-                        ),
-                      )
-                    ),
+                        top: 8.0,
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.black,
+                            size: 24.0,
+                          ),
+                        )),
                   ],
                 ),
                 const SizedBox(height: 10.0),
@@ -144,7 +161,7 @@ class _DetailProductState extends State<DetailProduct> {
                       ),
                       const SizedBox(height: 8.0),
                       Text(
-                         ' ${widget.product["price"]} VND',
+                        ' ${widget.product["price"]} VND',
                         style: const TextStyle(
                           fontSize: 18.0,
                           color: Colors.red,
@@ -152,11 +169,8 @@ class _DetailProductState extends State<DetailProduct> {
                       ),
                       const SizedBox(height: 8.0),
                       const Text('Màu sắc',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17.0
-                        )
-                      ),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 17.0)),
                       InkWell(
                         child: GridView.builder(
                           physics: const NeverScrollableScrollPhysics(),
@@ -171,17 +185,11 @@ class _DetailProductState extends State<DetailProduct> {
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             return InkWell(
-                              onTap: () {},
-                              child: Card(
-                                color: const Color(0xFFD9D9D9),
-                                child: Center(
-                                  child: 
-                                  Text(
-                                    color[index].toString()
-                                  )
-                                )
-                              )
-                            );
+                                onTap: () {},
+                                child: Card(
+                                    color: const Color(0xFFD9D9D9),
+                                    child: Center(
+                                        child: Text(color[index].toString()))));
                           },
                         ),
                       ),
@@ -189,25 +197,19 @@ class _DetailProductState extends State<DetailProduct> {
                         height: 20.0,
                       ),
                       const Text('Mô tả sản phẩm',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15.0
-                        )
-                      ),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15.0)),
                       Container(
                           width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
-                            color: const Color(0XFFD9D9D9),
-                            borderRadius: BorderRadius.circular(15)
-                          ),
+                              color: const Color(0XFFD9D9D9),
+                              borderRadius: BorderRadius.circular(15)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  '${widget.product["description"]}'
-                                )
+                                Text('${widget.product["description"]}')
                               ],
                             ),
                           )),
@@ -224,5 +226,4 @@ class _DetailProductState extends State<DetailProduct> {
       ),
     );
   }
-
 }

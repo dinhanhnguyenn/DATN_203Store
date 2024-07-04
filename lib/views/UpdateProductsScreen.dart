@@ -17,9 +17,8 @@ class UpdateProductScreen extends StatefulWidget {
 class _UpdateProductScreenState extends State<UpdateProductScreen> {
 
   Product newproduct =
-      Product(product_id: "", name: "", quantity: "", image: "", price: "", category_id: "", description: "",status: "");
+      Product(product_id: "", name: "", image: "", price: "", category_id: "", description: "",status: "");
   var tensp = TextEditingController();
-  var soluongsp = TextEditingController();
   var dongiasp = TextEditingController();
   var mota = TextEditingController(); 
 
@@ -33,12 +32,11 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
     tensp.text = '${widget.product["name"]}';
     dongiasp.text = '${widget.product["price"]}';
     mota.text = '${widget.product["description"]}';
-    soluongsp.text = '${widget.product["quantity"]}';
     loai = '${widget.product["category_id"]}';
   }
 
   Future<void> loadCategories() async {
-    final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadCategories.php'));
+    final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadCategories.php'));
     if (response.statusCode == 200) {
       setState(() {
         categoryList = json.decode(response.body);
@@ -98,7 +96,7 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                   ),
            
                   child: _image == null
-                  ?  Image.network("http://192.168.1.6/flutter/uploads/${widget.product["image"]}", fit: BoxFit.cover, scale: 1.0,)
+                  ?  Image.network("http://192.168.1.3/flutter/uploads/${widget.product["image"]}", fit: BoxFit.cover, scale: 1.0,)
                   : Image.file(_image!, fit: BoxFit.cover),
                 )
               ),
@@ -193,34 +191,6 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      "Số lượng",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              TextField(
-                controller: soluongsp,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0)),
-                  focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black)),
-                  prefixIcon: const Icon(Icons.numbers_sharp),
-                ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              const Row(
-                children: [
-                  Expanded(
-                    child: Text(
                       "Loại",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -274,7 +244,6 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                         name: tensp.text, 
                         image: _image?.path ?? "", 
                         price: dongiasp.text,
-                        quantity: soluongsp.text,
                         category_id: loai!,
                         description: mota.text,
                         status: 1.toString()
@@ -303,12 +272,11 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
 }
 
 Future productUpdate(Product pro) async {
-  final uri = Uri.parse('http://192.168.1.6/flutter/updateProduct.php');
+  final uri = Uri.parse('http://192.168.1.3/flutter/updateProduct.php');
   var request = http.MultipartRequest('POST', uri);
  
   request.fields['product_id'] = pro.product_id;
   request.fields['name'] = pro.name;
-  request.fields['quantity'] = pro.quantity;
   request.fields['price'] = pro.price;
   request.fields['category_id'] = pro.category_id;
   request.fields['description'] = pro.description;

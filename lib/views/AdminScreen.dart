@@ -77,6 +77,39 @@ class _AdminScreenState extends State<AdminScreen> {
                       children: [
                         Icon(Icons.category),
                         Text(
+                          "Nhập sản phẩm",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CategoriesManagerScreen(),
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: const Color(0XFFD9D9D9),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child:  Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.category),
+                        Text(
                           "Quản lý danh mục",
                           style: TextStyle(
                             fontWeight: FontWeight.bold

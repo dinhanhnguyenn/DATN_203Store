@@ -14,15 +14,25 @@ class DetailProduct extends StatefulWidget {
 
 class _DetailProductState extends State<DetailProduct> {
 
-  
+  List<dynamic> productList = [];
 
-  final List<String> color = [
-    'Vàng',
-    'Xanh lá',
-    'Đen',
-    'Xanh lam',
-    'Hồng',
-  ];
+  List<dynamic> colorList = [];
+  Future<void> loadColors() async {
+    final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadColor.php'));
+    if (response.statusCode == 200) {
+      setState(() {
+        colorList = json.decode(response.body);
+      });
+    } else {
+      throw Exception('Load thất bại');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadColors();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +119,7 @@ class _DetailProductState extends State<DetailProduct> {
                 Stack(
                   children: [
                     Image.network(
-                       "http://192.168.1.6/flutter/uploads/${widget.product["image"]}",
+                       "http://192.168.1.3/flutter/uploads/${widget.product["image"]}",
                       height: 300,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -167,7 +177,7 @@ class _DetailProductState extends State<DetailProduct> {
                             mainAxisSpacing: 8.0,
                             childAspectRatio: 2.5,
                           ),
-                          itemCount: color.length,
+                          itemCount: colorList.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             return InkWell(
@@ -177,7 +187,7 @@ class _DetailProductState extends State<DetailProduct> {
                                 child: Center(
                                   child: 
                                   Text(
-                                    color[index].toString()
+                                    colorList[2]["color_name"]
                                   )
                                 )
                               )
@@ -224,5 +234,4 @@ class _DetailProductState extends State<DetailProduct> {
       ),
     );
   }
-
 }

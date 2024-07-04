@@ -174,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     
                                     child: Center(
                                       child: Image.network(
-                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.3/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -220,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<List> loadProduct() async {
-    final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadProduct.php'));
+    final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

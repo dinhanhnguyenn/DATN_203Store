@@ -1,4 +1,5 @@
 import 'package:app_203store/views/AccountScreen.dart';
+import 'package:app_203store/views/AddProductDetail.dart';
 import 'package:app_203store/views/AddProductScreen.dart';
 import 'package:app_203store/views/AdminScreen.dart';
 import 'package:app_203store/views/Cart_Page.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/admin',
+      initialRoute: '',
       routes: {
         '/': (context) => const MainScreen(),
         '/login': (context) => const LoginPage(),
@@ -35,7 +36,8 @@ class MyApp extends StatelessWidget {
         '/addproduct': (context) => const AddProductsScreen(),
         '/productmanager': (context) => const ProductManagerScreen(),
         '/categorymanager':(context) => const CategoriesManagerScreen(),
-        '/admin':(context) => const AdminScreen()
+        '/admin':(context) => const AdminScreen(),
+        '/addproductdetail':(context) => const AddProductDetailScreen()
       },
     );
   }

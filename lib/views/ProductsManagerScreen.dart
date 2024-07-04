@@ -92,7 +92,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                             child: SizedBox(
                               width: 100,
                               height: 100,
-                              child: Image.network("http://192.168.1.6/flutter/uploads/${productListByAdmin[index]["image"]}", fit: BoxFit.cover),
+                              child: Image.network("http://192.168.1.3/flutter/uploads/${productListByAdmin[index]["image"]}", fit: BoxFit.cover),
                             ),
                           ),
                           Expanded(
@@ -112,19 +112,10 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  Text(
-                                    "Số lượng: ${productListByAdmin[index]["quantity"]}",
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width - 140,
                                     child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
@@ -135,7 +126,6 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                                               name: "", 
                                               image: "", 
                                               price: "",
-                                              quantity: "",
                                               category_id: "",
                                               description: "",
                                               status: ""
@@ -177,7 +167,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
 }
 
 Future<List> loadProductByAdmin() async {
-  final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadProductByAdmin.php'));
+  final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadProductByAdmin.php'));
   if (response.statusCode == 200) {
     return json.decode(response.body);
   } else {
@@ -186,7 +176,7 @@ Future<List> loadProductByAdmin() async {
 }
 
 Future productDelete(Product pro) async {
-  final uri = Uri.parse('http://192.168.1.6/flutter/deleteProduct.php');
+  final uri = Uri.parse('http://192.168.1.3/flutter/deleteProduct.php');
   var request = http.MultipartRequest('POST', uri);
  
   request.fields['product_id'] = pro.product_id;

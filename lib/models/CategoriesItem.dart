@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app_203store/views/Cart_Page.dart';
+import 'package:app_203store/views/CategoryScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -41,7 +42,12 @@ class _CategoriesItemState extends State<CategoriesItem> {
               itemBuilder: (context, index) {
                 return InkWell(
                   onTap: (){
-                    
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CategoryScreen(category: categoryList[index]),
+                      ),
+                    );
                   },
                   child: Container(
                     width: MediaQuery.of(context).size.width / 3 - 30,
@@ -74,7 +80,7 @@ class _CategoriesItemState extends State<CategoriesItem> {
 }
 
 Future<List> loadCategories() async {
-  final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadCategories.php'));
+  final response = await http.get(Uri.parse('http://192.168.1.15/flutter/loadCategories.php'));
   if (response.statusCode == 200) {
     return json.decode(response.body);
   } else {

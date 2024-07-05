@@ -14,14 +14,13 @@ class DetailProduct extends StatefulWidget {
 
 class _DetailProductState extends State<DetailProduct> {
 
-  List<dynamic> productList = [];
-
-  List<dynamic> colorList = [];
+  List<String> colors = [];
   Future<void> loadColors() async {
-    final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadColor.php'));
+    final response = await http.get(Uri.parse('http://192.168.1.15/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
       setState(() {
-        colorList = json.decode(response.body);
+        colors = data.map((item) => item['color_name'] as String).toList();
       });
     } else {
       throw Exception('Load thất bại');
@@ -119,7 +118,7 @@ class _DetailProductState extends State<DetailProduct> {
                 Stack(
                   children: [
                     Image.network(
-                       "http://192.168.1.3/flutter/uploads/${widget.product["image"]}",
+                       "http://192.168.1.15/flutter/uploads/${widget.product["image"]}",
                       height: 300,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -177,7 +176,7 @@ class _DetailProductState extends State<DetailProduct> {
                             mainAxisSpacing: 8.0,
                             childAspectRatio: 2.5,
                           ),
-                          itemCount: colorList.length,
+                          itemCount: colors.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             return InkWell(
@@ -187,7 +186,7 @@ class _DetailProductState extends State<DetailProduct> {
                                 child: Center(
                                   child: 
                                   Text(
-                                    colorList[2]["color_name"]
+                                    colors[index]
                                   )
                                 )
                               )
@@ -233,5 +232,14 @@ class _DetailProductState extends State<DetailProduct> {
         ),
       ),
     );
+  }
+
+  Future<List> loadProduct() async {
+    final response = await http.get(Uri.parse('http://192.168.1.15/flutter/loadColorByProductDetail.php?product_id=${widget.product["product_id"]}'));
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Load thất bại');
+    }
   }
 }

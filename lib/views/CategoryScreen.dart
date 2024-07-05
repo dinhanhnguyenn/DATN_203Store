@@ -1,138 +1,29 @@
 import 'dart:convert';
-import 'package:app_203store/models/CategoriesItem.dart';
-import 'package:app_203store/views/Cart_Page.dart';
+
 import 'package:app_203store/views/DetailProduct.dart';
-import 'package:app_203store/views/SearchScreen.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class CategoryScreen extends StatefulWidget {
+  CategoryScreen({super.key, required this.category});
+  var category;
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-
-  final List<String> imagelist = [
-    "assets/1.jpg",
-    "assets/2.jpg",
-    "assets/3.jpg",
-    "assets/4.jpg",
-    "assets/5.jpg",
-    "assets/6.jpg",
-    "assets/7.jpg",
-  ];
-
+class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.lightBlue[200],
-        title:Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 7.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "203 Store",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25,
-                      color: Colors.blue
-                    ),
-                  ),
-                  Text(
-                    "Cung cấp các sản phẩm Apple chính hãng",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Row(
-              children: [
-                Container(
-                  color: Colors.transparent,
-                  child: IconButton(
-                    onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchScreen()));
-                    },
-                    icon: const Icon(
-                      Icons.search,
-                      color: Colors.black,
-                    )
-                  ),
-                ),
-                Container(
-                  color: Colors.transparent,
-                  child: IconButton(
-                    onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) =>  Cart()));
-                    },
-                    icon: const Icon(
-                      Icons.shopping_cart_outlined,
-                      color: Colors.black,
-                    )
-                  ),
-                )
-              ],
-            )
-          ],
-        )
+        title: Text("${widget.category["category_name"]}")
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            const CategoriesItem(),
-            const SizedBox(height: 20),
-            Container(
-              color: Colors.transparent,
-              child: CarouselSlider(
-                options: CarouselOptions(
-                  height: 200,
-                  enlargeCenterPage: true,
-                  autoPlay: true,
-                  autoPlayInterval: const Duration(seconds: 3),
-                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                  autoPlayCurve: Curves.fastOutSlowIn,
-                  onPageChanged: (index, reason) {
-                    
-                  },
-                ),
-                items: imagelist.map((imagePath) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return Container(
-                        height: MediaQuery.of(context).size.height / 2,
-                        width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: Image.asset(
-                            imagePath,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 20),
             FutureBuilder(
-              future: loadProduct(),
+              future: loadProductByCategory(),
               builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -218,15 +109,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  Future<List> loadProduct() async {
-    final response = await http.get(Uri.parse('http://192.168.1.15/flutter/loadProduct.php'));
+  Future<List> loadProductByCategory() async {
+    final response = await http.get(Uri.parse('http://192.168.1.15/flutter/loadProductByCategory.php?category_id=${widget.category["category_id"]}'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
       throw Exception('Load thất bại');
     }
   }
-
-  
 }
+

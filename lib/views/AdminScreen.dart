@@ -1,3 +1,4 @@
+import 'package:app_203store/views/AccountManagerScreen.dart';
 import 'package:app_203store/views/CategoriesManagerScreen.dart';
 import 'package:app_203store/views/ProductsManagerScreen.dart';
 import 'package:flutter/material.dart';
@@ -151,7 +152,12 @@ class _AdminScreenState extends State<AdminScreen> {
               const SizedBox(height: 12),
               InkWell(
                 onTap: () {
-                  
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AccountManagerScreen(),
+                    ),
+                  );
                 },
                 child: Container(
                   height: 50,

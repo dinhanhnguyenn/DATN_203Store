@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.transparent,
                   child: IconButton(
                     onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => SearchScreen()));
                     },
                     icon: const Icon(
                       Icons.search,
@@ -174,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     
                                     child: Center(
                                       child: Image.network(
-                                        "http://192.168.1.15/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -220,13 +220,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<List> loadProduct() async {
-    final response = await http.get(Uri.parse('http://192.168.1.15/flutter/loadProduct.php'));
+    final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
       throw Exception('Load thất bại');
     }
   }
-
-  
 }

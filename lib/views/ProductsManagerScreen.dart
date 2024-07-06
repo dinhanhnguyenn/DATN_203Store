@@ -15,17 +15,17 @@ class ProductManagerScreen extends StatefulWidget {
 class _ProductManagerScreenState extends State<ProductManagerScreen> {
 
   Future<void> _loadData() async {
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
     print("Data loaded");
     setState(() {
-
+      const ProductManagerScreen();
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _loadData(); // Initial data load
+    _loadData();
   }
 
   @override
@@ -64,7 +64,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text('No data available'));
+              return Center(child: Text('Không có dữ liệu'));
             } else {
               List<dynamic> productListByAdmin = snapshot.data!;
               return Padding(
@@ -92,7 +92,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                             child: SizedBox(
                               width: 100,
                               height: 100,
-                              child: Image.network("http://192.168.1.3/flutter/uploads/${productListByAdmin[index]["image"]}", fit: BoxFit.cover),
+                              child: Image.network("http://192.168.1.6/flutter/uploads/${productListByAdmin[index]["image"]}", fit: BoxFit.cover),
                             ),
                           ),
                           Expanded(
@@ -103,7 +103,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Sản phẩm: ${productListByAdmin[index]["name"]}",
+                                    "${productListByAdmin[index]["name"]}",
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 17
@@ -167,7 +167,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
 }
 
 Future<List> loadProductByAdmin() async {
-  final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadProductByAdmin.php'));
+  final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadProductByAdmin.php'));
   if (response.statusCode == 200) {
     return json.decode(response.body);
   } else {
@@ -176,7 +176,7 @@ Future<List> loadProductByAdmin() async {
 }
 
 Future productDelete(Product pro) async {
-  final uri = Uri.parse('http://192.168.1.3/flutter/deleteProduct.php');
+  final uri = Uri.parse('http://192.168.1.6/flutter/deleteProduct.php');
   var request = http.MultipartRequest('POST', uri);
  
   request.fields['product_id'] = pro.product_id;

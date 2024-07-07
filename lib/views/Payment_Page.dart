@@ -1,4 +1,6 @@
+import 'package:app_203store/models/UserProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Payment extends StatefulWidget {
   const Payment({super.key});
@@ -10,15 +12,10 @@ class Payment extends StatefulWidget {
 class _PaymentState extends State<Payment> {
   @override
   Widget build(BuildContext context) {
+    int userId = Provider.of<UserProvider>(context).userId;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.lightBlue[200],
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         title:
             Text('Thanh Toán', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
@@ -28,19 +25,6 @@ class _PaymentState extends State<Payment> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              TextField(
-                decoration: InputDecoration(labelText: 'Điện Thoại'),
-                keyboardType: TextInputType.phone,
-              ),
-              SizedBox(height: 20),
-              TextField(
-                decoration: InputDecoration(labelText: 'Địa Chỉ'),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                decoration: InputDecoration(labelText: 'Ghi Chú'),
-              ),
-              SizedBox(height: 40),
               Text(
                 'Chọn phương thức thanh toán',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -85,7 +69,7 @@ class _PaymentState extends State<Payment> {
                   ),
                   ElevatedButton(
                     onPressed: () {},
-                    child: Text('Tiếp Tục'),
+                    child: Text('Thanh Toán'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,

@@ -1,20 +1,17 @@
 import 'dart:convert';
 
 import 'package:app_203store/models/CategoriesItem.dart';
+import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/DetailProduct.dart';
 import 'package:app_203store/views/SearchScreen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
   final List<String> imagelist = [
     "assets/1.jpg",
     "assets/2.jpg",
@@ -73,10 +70,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.transparent,
                     child: IconButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Cart()));
+                          int userId =
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .userId;
+                          if (userId == 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Vui lòng đăng nhập để thêm vào giỏ hàng')),
+                            );
+                            return;
+                          } else {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const Cart()));
+                          }
                         },
                         icon: const Icon(
                           Icons.shopping_cart_outlined,
@@ -173,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Expanded(
                                     child: Center(
                                       child: Image.network(
-                                        "http://192.168.50.111/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.30.103/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -221,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<List> fetchData() async {
     final response = await http
-        .get(Uri.parse('http://192.168.50.111/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.30.103/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

@@ -1,23 +1,26 @@
 import 'dart:convert';
+import 'package:app_203store/models/CartProdvider.dart';
+import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/ForgetPass_Page.dart';
-import 'package:app_203store/views/HomeScreen.dart';
 import 'package:app_203store/views/MainScreen.dart';
+import 'package:app_203store/views/Register_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'Register_Page.dart';
+import 'package:provider/provider.dart';
+// Điều hướng đến màn hình chính sau khi đăng nhập thành công
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> _login() async {
+  Future<void> _login(BuildContext context) async {
     final response = await http.post(
       Uri.parse('http://192.168.30.103/flutter/login.php'),
       body: {
@@ -32,8 +35,23 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(jsonResponse['message'])),
         );
+
+        // Lấy thông tin user từ response
+        final userId = jsonResponse['user_id'];
+        final userName = jsonResponse['username'];
+        final userEmail = jsonResponse['email'];
+        final userFullName = jsonResponse['full_name'];
+        final idCart = jsonResponse['id_cart']; // Lấy id_cart từ response
+
+        // Cập nhật thông tin user và id_cart vào Provider
+        Provider.of<CartProvider>(context, listen: false).setIdCart(idCart);
+        Provider.of<UserProvider>(context, listen: false).setUserId(userId);
+
+        // Điều hướng đến màn hình chính
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => MainScreen()));
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(jsonResponse['message'])),
@@ -48,15 +66,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    int userId = Provider.of<UserProvider>(context).userId;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.lightBlue[200],
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -153,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       backgroundColor: Colors.lightBlue[200],
                     ),
-                    onPressed: _login,
+                    onPressed: () => _login(context),
                     child: const Text(
                       "Đăng Nhập",
                       style: TextStyle(fontSize: 16, color: Colors.white),

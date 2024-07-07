@@ -1,6 +1,11 @@
 import 'dart:convert';
+import 'package:app_203store/models/CartProdvider.dart';
+import 'package:app_203store/models/UserProvider.dart';
+import 'package:app_203store/views/Payment_Page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class Cart extends StatefulWidget {
   const Cart({Key? key}) : super(key: key);
@@ -20,20 +25,23 @@ class _CartState extends State<Cart> {
   }
 
   Future<void> _fetchCartItems() async {
-    final response = await http
-        .get(Uri.parse('http://192.168.30.103/flutter/loadDetail_Order.php'));
+    final idCart = Provider.of<CartProvider>(context, listen: false).idCart;
+    final response = await http.post(
+      Uri.parse('http://192.168.30.103/flutter/loadDetail_Cart.php'),
+      body: {'id_cart': idCart.toString()},
+    );
 
     if (response.statusCode == 200) {
-      print(response.body); // In ra nội dung phản hồi để kiểm tra
       try {
         final List<dynamic> items = jsonDecode(response.body);
         setState(() {
           _cartItems = items.map((item) {
             return {
-              'order_detail_id': item['order_detail_id'].toString(),
+              'cartz_detail_id': item['cartz_detail_id'].toString(),
               'image': item['image'].toString(),
               'price': item['price'].toString(),
               'quantity': int.parse(item['quantity'].toString()),
+              'product_id': int.parse(item['product_id'].toString()),
             };
           }).toList();
           _calculateTotalPrice();
@@ -42,6 +50,8 @@ class _CartState extends State<Cart> {
         print("Error parsing JSON: $e");
       }
     } else {
+      print(
+          'Failed to load cart items with status code: ${response.statusCode}');
       throw Exception('Failed to load cart items');
     }
   }
@@ -56,10 +66,10 @@ class _CartState extends State<Cart> {
     });
   }
 
-  Future<void> _deleteOrder(String orderDetailId) async {
+  Future<void> _deleteItemCart(String cartDetailId) async {
     final response = await http.post(
       Uri.parse('http://192.168.30.103/flutter/update_status.php'),
-      body: {'order_detail_id': orderDetailId},
+      body: {'cartz_detail_id': cartDetailId},
     );
 
     if (response.statusCode == 200) {
@@ -67,55 +77,105 @@ class _CartState extends State<Cart> {
       if (data['status'] == 'success') {
         setState(() {
           _cartItems
-              .removeWhere((item) => item['order_detail_id'] == orderDetailId);
+              .removeWhere((item) => item['cartz_detail_id'] == cartDetailId);
           _calculateTotalPrice();
         });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Xóa đơn hàng thành công')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Xóa đơn hàng thành công')),
+        // );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Xóa thất bại: ${data['message']}')),
         );
       }
     } else {
+      print('Failed to delete item with status code: ${response.statusCode}');
       throw Exception('Failed to delete order');
     }
   }
 
-  Future<void> _updateQuantity(String orderDetailId, int newQuantity) async {
-    print('Updating quantity: $orderDetailId, $newQuantity');
+  Future<void> _updateQuantity(String cartDetailId, int newQuantity) async {
     final response = await http.post(
       Uri.parse('http://192.168.30.103/flutter/update_quantity.php'),
       body: {
-        'order_detail_id': orderDetailId,
+        'cartz_detail_id': cartDetailId,
         'new_quantity': newQuantity.toString(),
       },
     );
-
-    print(response.body); // Thêm dòng này để kiểm tra phản hồi
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data['status'] == 'success') {
         setState(() {
           _cartItems.firstWhere((item) =>
-                  item['order_detail_id'] == orderDetailId)['quantity'] =
+                  item['cartz_detail_id'] == cartDetailId)['quantity'] =
               newQuantity;
           _calculateTotalPrice();
         });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Cập nhật số lượng thành công')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Cập nhật số lượng thành công')),
+        // );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Cập nhật thất bại: ${data['message']}')),
         );
       }
     } else {
+      print(
+          'Failed to update quantity with status code: ${response.statusCode}');
       throw Exception('Failed to update quantity');
+    }
+  }
+
+  Future<void> _createOrder() async {
+    int userId = Provider.of<UserProvider>(context, listen: false).userId;
+    double totalPrice = _totalPrice;
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.30.103/flutter/addOrder.php'),
+        body: {
+          'user_id': userId.toString(),
+          'total': totalPrice.toString(),
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == 'success') {
+          int orderId = data['order_id'];
+
+          // Gọi API để thêm chi tiết đơn hàng
+          for (var item in _cartItems) {
+            await http.post(
+              Uri.parse('http://192.168.30.103/flutter/addDetailOrder.php'),
+              body: {
+                'order_id': orderId.toString(),
+                'product_id': item['product_id'].toString(),
+                'quantity': item['quantity'].toString(),
+              },
+            );
+            _deleteItemCart(item['cartz_detail_id']);
+          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Payment()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Lỗi: ${data['message']}')),
+          );
+        }
+      } else {
+        print(
+            'Failed to create order with status code: ${response.statusCode}');
+        throw Exception('Failed to create order');
+      }
+    } catch (e) {
+      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi không xác định')),
+      );
     }
   }
 
@@ -140,109 +200,121 @@ class _CartState extends State<Cart> {
               itemCount: _cartItems.length,
               itemBuilder: (context, index) {
                 var item = _cartItems[index];
-                return ListTile(
-                  leading: Image.network(
-                    'http://192.168.30.103/flutter/uploads/${item['image']}',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
-                  title: Text(item['order_detail_id'].toString()),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.remove),
-                            onPressed: () {
-                              if (item['quantity'] > 1) {
-                                _updateQuantity(
-                                    item['order_detail_id'].toString(),
-                                    item['quantity'] - 1);
-                              }
-                            },
-                          ),
-                          Text('Số lượng: ${item['quantity']}'),
-                          IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: () {
-                              _updateQuantity(
-                                  item['order_detail_id'].toString(),
-                                  item['quantity'] + 1);
-                            },
-                          ),
-                        ],
-                      ),
-                      Text('Giá: ${item['price']} VND'),
-                    ],
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text("Xóa đơn hàng"),
-                            content:
-                                Text("Bạn có chắc chắn muốn xóa đơn hàng này?"),
-                            actions: [
-                              TextButton(
-                                child: Text("Hủy"),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              TextButton(
-                                child: Text("Xóa"),
-                                onPressed: () {
-                                  _deleteOrder(
-                                      item['order_detail_id'].toString());
-                                  Navigator.of(context).pop();
-                                },
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  elevation: 4,
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Row(
+                      children: [
+                        Image.network(
+                          'http://192.168.30.103/flutter/uploads/${item['image']}',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
+                        SizedBox(width: 5),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.remove),
+                                    onPressed: () {
+                                      if (item['quantity'] > 1) {
+                                        _updateQuantity(item['cartz_detail_id'],
+                                            item['quantity'] - 1);
+                                      }
+                                    },
+                                  ),
+                                  Text(
+                                    '${item['quantity']}',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.add),
+                                    onPressed: () {
+                                      _updateQuantity(item['cartz_detail_id'],
+                                          item['quantity'] + 1);
+                                    },
+                                  ),
+                                  SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      ' Gía \$${item['price']}',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
-                          );
-                        },
-                      );
-                    },
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            _deleteItemCart(item['cartz_detail_id']);
+                          },
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
             ),
           ),
-          Column(
-            children: [
-              Text(
-                'Tổng tiền: $_totalPrice VND',
-                style: TextStyle(
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('Tiếp Tục'),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.lightBlue[200],
-                  padding: EdgeInsets.symmetric(
-                      vertical: 16, horizontal: 24), // Kích thước của nút
-                  textStyle:
-                      TextStyle(fontSize: 18), // Kiểu chữ của văn bản nút
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(8), // Độ bo tròn các góc của nút
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: Column(
+              children: [
+                Text(
+                  'Tổng cộng: \$$_totalPrice',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 15,
+                      horizontal: 40,
+                    ),
+                    backgroundColor: Colors.lightBlue[200],
+                  ),
+                  onPressed: () {
+                    if (_cartItems.isNotEmpty && _totalPrice > 0) {
+                      _createOrder();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Không có mặt hàng trong giỏ hàng!'),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text(
+                    "Mua Hàng",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
           ),
-          SizedBox(height: 16.0),
         ],
       ),
     );

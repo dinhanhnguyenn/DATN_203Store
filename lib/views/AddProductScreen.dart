@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:app_203store/models/Product.dart';
+import 'package:app_203store/models/UserProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class AddProductsScreen extends StatefulWidget {
   const AddProductsScreen({super.key});
@@ -37,6 +39,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
       _image = pickedImage != null ? File(pickedImage.path) : null;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +265,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
 }
 
 Future productAdd(Product pro) async {
-  final uri = Uri.parse('http://192.168.72.181/flutter/addProduct.php');
+  final uri = Uri.parse('http://192.168.30.103/flutter/addProduct.php');
   var request = http.MultipartRequest('POST', uri);
   request.fields['name'] = pro.name;
   request.fields['quantity'] = pro.quantity;

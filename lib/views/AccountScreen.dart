@@ -1,5 +1,6 @@
 import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/UpdateProfile.dart';
+import 'package:app_203store/views/purchase_history_Page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -109,7 +110,11 @@ class _AccountScreenState extends State<AccountScreen> {
               leading: Icon(Icons.history),
               title: Text('Lịch Sử Giao Dịch'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PurchaseHistory(user_id: userId)),
+                );
               },
             ),
             Divider(),

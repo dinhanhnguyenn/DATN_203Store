@@ -1,7 +1,10 @@
 import 'package:app_203store/models/CartProdvider.dart';
 import 'package:app_203store/views/AccountScreen.dart';
+import 'package:app_203store/views/AddProductDetail.dart';
 import 'package:app_203store/views/AddProductScreen.dart';
+import 'package:app_203store/views/AdminScreen.dart';
 import 'package:app_203store/views/Cart_Page.dart';
+import 'package:app_203store/views/CategoriesManagerScreen.dart';
 import 'package:app_203store/views/ForgetPass_Page.dart';
 import 'package:app_203store/views/HomeScreen.dart';
 import 'package:app_203store/views/Login_Page.dart';
@@ -9,6 +12,7 @@ import 'package:app_203store/views/MainScreen.dart';
 import 'package:app_203store/views/NotificationsScreen.dart';
 import 'package:app_203store/views/Payment_Page.dart';
 import 'package:app_203store/views/Register_Page.dart';
+import 'package:app_203store/views/UpdateProductsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app_203store/models/UserProvider.dart';

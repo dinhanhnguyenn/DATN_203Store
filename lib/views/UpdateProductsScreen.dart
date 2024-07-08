@@ -2,20 +2,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:app_203store/models/Product.dart';
-import 'package:app_203store/models/UserProvider.dart';
+import 'package:app_203store/views/ProductsManagerScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 
-class AddProductsScreen extends StatefulWidget {
-  const AddProductsScreen({super.key});
-
+class UpdateProductScreen extends StatefulWidget {
+  UpdateProductScreen({super.key, required this.product});
+  var product;
   @override
-  State<AddProductsScreen> createState() => _AddProductsScreenState();
+  State<UpdateProductScreen> createState() => _UpdateProductScreenState();
 }
 
-class _AddProductsScreenState extends State<AddProductsScreen> {
+class _UpdateProductScreenState extends State<UpdateProductScreen> {
   Product newproduct = Product(
       product_id: "",
       name: "",
@@ -35,6 +34,10 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
   void initState() {
     super.initState();
     loadCategories();
+    tensp.text = '${widget.product["name"]}';
+    dongiasp.text = '${widget.product["price"]}';
+    mota.text = '${widget.product["description"]}';
+    loai = '${widget.product["category_id"]}';
   }
 
   Future<void> loadCategories() async {
@@ -70,7 +73,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
             },
             icon: const Icon(Icons.arrow_back),
           ),
-          title: const Text("Thêm Sản Phẩm"),
+          title: const Text("Cập nhật sản phẩm"),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -97,9 +100,11 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                       ],
                     ),
                     child: _image == null
-                        ? Center(
-                            child: Text('',
-                                style: TextStyle(color: Colors.grey[600])))
+                        ? Image.network(
+                            "http://192.168.30.103/flutter/uploads/${widget.product["image"]}",
+                            fit: BoxFit.cover,
+                            scale: 1.0,
+                          )
                         : Image.file(_image!, fit: BoxFit.cover),
                   )),
               const SizedBox(
@@ -241,15 +246,16 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
+                      print("Kết quả: " + loai!);
                       Product add = Product(
-                          product_id: "",
+                          product_id: widget.product['product_id'],
                           name: tensp.text,
                           image: _image?.path ?? "",
                           price: dongiasp.text,
                           category_id: loai!,
                           description: mota.text,
                           status: 1.toString());
-                      productAdd(add);
+                      productUpdate(add);
                     },
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(180, 60),
@@ -257,7 +263,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                             borderRadius: BorderRadius.circular(10.0)),
                         backgroundColor: Colors.lightBlue[200]),
                     child: const Text(
-                      "Thêm mới",
+                      "Cập nhật",
                       style: TextStyle(
                           fontSize: 20,
                           color: Colors.white,
@@ -272,9 +278,11 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
   }
 }
 
-Future productAdd(Product pro) async {
-  final uri = Uri.parse('http://192.168.30.103/flutter/addProduct.php');
+Future productUpdate(Product pro) async {
+  final uri = Uri.parse('http://192.168.30.103/flutter/updateProduct.php');
   var request = http.MultipartRequest('POST', uri);
+
+  request.fields['product_id'] = pro.product_id;
   request.fields['name'] = pro.name;
   request.fields['price'] = pro.price;
   request.fields['category_id'] = pro.category_id;
@@ -290,8 +298,8 @@ Future productAdd(Product pro) async {
   var response = await request.send();
 
   if (response.statusCode == 200) {
-    print("Thêm thành công");
+    print("Cập nhật thành công");
   } else {
-    print("Thêm thất bại");
+    print("Cập nhật thất bại");
   }
 }

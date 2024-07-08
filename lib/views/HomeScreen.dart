@@ -59,7 +59,7 @@ class HomeScreen extends StatelessWidget {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const SearchScreen()));
+                                  builder: (context) => SearchScreen()));
                         },
                         icon: const Icon(
                           Icons.search,
@@ -70,22 +70,8 @@ class HomeScreen extends StatelessWidget {
                     color: Colors.transparent,
                     child: IconButton(
                         onPressed: () {
-                          int userId =
-                              Provider.of<UserProvider>(context, listen: false)
-                                  .userId;
-                          if (userId == 0) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text(
-                                      'Vui lòng đăng nhập để thêm vào giỏ hàng')),
-                            );
-                            return;
-                          } else {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Cart()));
-                          }
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => Cart()));
                         },
                         icon: const Icon(
                           Icons.shopping_cart_outlined,
@@ -139,7 +125,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             FutureBuilder(
-              future: fetchData(),
+              future: loadProduct(),
               builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -182,7 +168,7 @@ class HomeScreen extends StatelessWidget {
                                   Expanded(
                                     child: Center(
                                       child: Image.network(
-                                        "http://192.168.30.103/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.9/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -228,9 +214,9 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Future<List> fetchData() async {
+  Future<List> loadProduct() async {
     final response = await http
-        .get(Uri.parse('http://192.168.30.103/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.1.9/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

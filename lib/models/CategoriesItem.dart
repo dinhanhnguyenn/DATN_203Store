@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:app_203store/views/Cart_Page.dart';
+import 'package:app_203store/views/CategoryScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class CategoriesItem extends StatefulWidget {
   const CategoriesItem({super.key});
@@ -9,123 +14,42 @@ class CategoriesItem extends StatefulWidget {
 
 class _CategoriesItemState extends State<CategoriesItem> {
   
-  String category1 = 'iPhone';
-  String category2 = 'iPad';
-  String category3 = 'MacBook';
-  String category4 = 'AirPod';
-  String category5 = 'Apple Watch';
-  String category6 = 'Phụ kiện';
-  
   @override
   Widget build(BuildContext context) {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  height: 55,
-                  width: MediaQuery.of(context).size.width / 3 - 30,
-                  decoration: BoxDecoration(
-                    color: Colors.lightBlue[200],
-                    borderRadius: BorderRadius.circular(10)
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "assets/iphone.png",
-                        fit: BoxFit.cover,
-                        width: 25,
-                        height: 25,
-                      ),
-                      Text(
-                        category1, 
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+    return FutureBuilder(
+      future: loadCategories(),
+      builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No data available'));
+        } else {
+          List<dynamic> categoryList = snapshot.data!;
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 8.0,
+                mainAxisSpacing: 8.0,
+                childAspectRatio: 3.5,
               ),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  height: 55,
-                  width: MediaQuery.of(context).size.width / 3 - 30,
-                  decoration: BoxDecoration(
-                    color: Colors.lightBlue[200],
-                    borderRadius: BorderRadius.circular(10)
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "assets/ipad.png",
-                        fit: BoxFit.cover,
-                        width: 25,
-                        height: 25,
+              itemCount: categoryList.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CategoryScreen(category: categoryList[index]),
                       ),
-                      Text(
-                        category2, 
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  height: 55,
-                  width: MediaQuery.of(context).size.width / 3 - 30,
-                  decoration: BoxDecoration(
-                    color: Colors.lightBlue[200],
-                    borderRadius: BorderRadius.circular(10)
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "assets/mac.png",
-                        fit: BoxFit.cover,
-                        width: 25,
-                        height: 25,
-                      ),
-                      Text(
-                        category3, 
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                InkWell(
-                  onTap: () {},
+                    );
+                  },
                   child: Container(
-                    height: 55,
                     width: MediaQuery.of(context).size.width / 3 - 30,
                     decoration: BoxDecoration(
                       color: Colors.lightBlue[200],
@@ -135,14 +59,8 @@ class _CategoriesItemState extends State<CategoriesItem> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Image.asset(
-                          "assets/airpod.png",
-                          fit: BoxFit.cover,
-                          width: 25,
-                          height: 25,
-                        ),
                         Text(
-                        category4, 
+                            "${categoryList[index]["category_name"]}",
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold
@@ -151,70 +69,21 @@ class _CategoriesItemState extends State<CategoriesItem> {
                       ],
                     ),
                   ),
-                ),
-                InkWell(
-                  onTap: () {},
-                  child: Container(
-                    height: 55,
-                    width: MediaQuery.of(context).size.width / 3 - 30,
-                    decoration: BoxDecoration(
-                      color: Colors.lightBlue[200],
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/watch.png",
-                          fit: BoxFit.cover,
-                          width: 25,
-                          height: 25,
-                        ),
-                        Text(
-                        category5, 
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold
-                        ),
-                      )
-                      ],
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {},
-                  child: Container(
-                    height: 55,
-                    width: MediaQuery.of(context).size.width / 3 - 30,
-                    decoration: BoxDecoration(
-                      color: Colors.lightBlue[200],
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/type-c.png",
-                          fit: BoxFit.cover,
-                          width: 25,
-                          height: 25,
-                        ),
-                        Text(
-                        category6, 
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold
-                        ),
-                      )
-                      ],
-                    ),
-                  ),
-                )
-              ],
+                );
+              },
             ),
-          ),
-        ],
-      );
+          );
+        }
+      }
+    );
+  }
+}
+
+Future<List> loadCategories() async {
+  final response = await http.get(Uri.parse('http://192.168.30.103/flutter/loadCategories.php'));
+  if (response.statusCode == 200) {
+    return json.decode(response.body);
+  } else {
+    throw Exception('Load thất bại');
   }
 }

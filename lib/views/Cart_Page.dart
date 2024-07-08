@@ -27,7 +27,7 @@ class _CartState extends State<Cart> {
   Future<void> _fetchCartItems() async {
     final idCart = Provider.of<CartProvider>(context, listen: false).idCart;
     final response = await http.post(
-      Uri.parse('http://192.168.30.103/flutter/loadDetail_Cart.php'),
+      Uri.parse('http://192.168.1.9/flutter/loadDetail_Cart.php'),
       body: {'id_cart': idCart.toString()},
     );
 
@@ -42,6 +42,7 @@ class _CartState extends State<Cart> {
               'price': item['price'].toString(),
               'quantity': int.parse(item['quantity'].toString()),
               'product_id': int.parse(item['product_id'].toString()),
+              'id_color': int.parse(item['id_color']).toString()
             };
           }).toList();
           _calculateTotalPrice();
@@ -68,7 +69,7 @@ class _CartState extends State<Cart> {
 
   Future<void> _deleteItemCart(String cartDetailId) async {
     final response = await http.post(
-      Uri.parse('http://192.168.30.103/flutter/update_status.php'),
+      Uri.parse('http://192.168.1.9/flutter/update_status.php'),
       body: {'cartz_detail_id': cartDetailId},
     );
 
@@ -96,7 +97,7 @@ class _CartState extends State<Cart> {
 
   Future<void> _updateQuantity(String cartDetailId, int newQuantity) async {
     final response = await http.post(
-      Uri.parse('http://192.168.30.103/flutter/update_quantity.php'),
+      Uri.parse('http://192.168.1.9/flutter/update_quantity.php'),
       body: {
         'cartz_detail_id': cartDetailId,
         'new_quantity': newQuantity.toString(),
@@ -133,7 +134,7 @@ class _CartState extends State<Cart> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.30.103/flutter/addOrder.php'),
+        Uri.parse('http://192.168.1.9/flutter/addOrder.php'),
         body: {
           'user_id': userId.toString(),
           'total': totalPrice.toString(),
@@ -148,18 +149,23 @@ class _CartState extends State<Cart> {
           // Gọi API để thêm chi tiết đơn hàng
           for (var item in _cartItems) {
             await http.post(
-              Uri.parse('http://192.168.30.103/flutter/addDetailOrder.php'),
+              Uri.parse('http://192.168.1.9/flutter/addDetailOrder.php'),
               body: {
                 'order_id': orderId.toString(),
                 'product_id': item['product_id'].toString(),
                 'quantity': item['quantity'].toString(),
+                'id_color': item['id_color'].toString()
               },
             );
             _deleteItemCart(item['cartz_detail_id']);
           }
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => Payment()),
+            MaterialPageRoute(
+                builder: (context) => Payment(
+                      order_id: orderId,
+                      total: totalPrice,
+                    )),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -208,7 +214,7 @@ class _CartState extends State<Cart> {
                     child: Row(
                       children: [
                         Image.network(
-                          'http://192.168.30.103/flutter/uploads/${item['image']}',
+                          'http://192.168.1.9/flutter/uploads/${item['image']}',
                           width: 50,
                           height: 50,
                           fit: BoxFit.cover,

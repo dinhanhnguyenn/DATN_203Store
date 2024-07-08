@@ -1,9 +1,7 @@
 import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/UpdateProfile.dart';
 import 'package:app_203store/views/purchase_history_Page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -29,21 +27,35 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> _getUserInfo() async {
     userId = Provider.of<UserProvider>(context, listen: false).userId;
     final response = await http.post(
-      Uri.parse('http://192.168.30.103/flutter/get_user_info.php'),
+      Uri.parse('http://192.168.1.9/flutter/get_user_info.php'),
       body: {'user_id': userId.toString()},
     );
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       if (jsonResponse['success']) {
-        setState(() {
-          username = jsonResponse['username'] ?? ' ';
-          email = jsonResponse['email'] ?? ' ';
-          fullName = jsonResponse['full_name'] ?? ' ';
-          address = jsonResponse['address'] ?? ' ';
-          phone = jsonResponse['phone'] ?? ' ';
-        });
+        if (mounted) {
+          setState(() {
+            username = jsonResponse['username'] ?? ' ';
+            email = jsonResponse['email'] ?? ' ';
+            fullName = jsonResponse['full_name'] ?? ' ';
+            address = jsonResponse['address'] ?? ' ';
+            phone = jsonResponse['phone'] ?? ' ';
+          });
+        }
       } else {
+        if (mounted) {
+          setState(() {
+            username = ' ';
+            email = ' ';
+            fullName = ' ';
+            address = ' ';
+            phone = ' ';
+          });
+        }
+      }
+    } else {
+      if (mounted) {
         setState(() {
           username = ' ';
           email = ' ';
@@ -52,14 +64,6 @@ class _AccountScreenState extends State<AccountScreen> {
           phone = ' ';
         });
       }
-    } else {
-      setState(() {
-        username = ' ';
-        email = ' ';
-        fullName = ' ';
-        address = ' ';
-        phone = ' ';
-      });
     }
   }
 
@@ -99,11 +103,13 @@ class _AccountScreenState extends State<AccountScreen> {
               title: Text('Cập Nhật Thông Tin'),
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => UpdateProfile(
-                              userId: userId,
-                            )));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UpdateProfile(
+                      userId: userId,
+                    ),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -113,7 +119,8 @@ class _AccountScreenState extends State<AccountScreen> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => PurchaseHistory(user_id: userId)),
+                    builder: (context) => PurchaseHistory(user_id: userId),
+                  ),
                 );
               },
             ),
@@ -192,7 +199,6 @@ class _AccountScreenState extends State<AccountScreen> {
               ],
             ),
           ),
-          SizedBox(width: 16.0),
         ],
       ),
     );

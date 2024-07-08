@@ -10,6 +10,7 @@ import 'package:app_203store/views/HomeScreen.dart';
 import 'package:app_203store/views/Login_Page.dart';
 import 'package:app_203store/views/MainScreen.dart';
 import 'package:app_203store/views/NotificationsScreen.dart';
+import 'package:app_203store/views/OrderManager.dart';
 import 'package:app_203store/views/Payment_Page.dart';
 import 'package:app_203store/views/Register_Page.dart';
 import 'package:app_203store/views/UpdateProductsScreen.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         '/notifi': (context) => const NotificationsScreen(),
         '/addproduct': (context) => const AddProductsScreen(),
         '/cart': (context) => const Cart(),
+        '/order': (context) => ManageOrdersPage(),
       },
     );
   }

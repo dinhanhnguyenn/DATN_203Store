@@ -351,7 +351,7 @@ class _DetailProductState extends State<DetailProduct> {
 
   Future<List> loadProduct() async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.9/flutter/loadColorByProductDetail.php?product_id=${widget.product["product_id"]}'));
+        'http://192.168.1.103/flutter/loadColorByProductDetail.php?product_id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

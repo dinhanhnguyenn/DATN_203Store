@@ -27,7 +27,7 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
     }
 
     final response = await http.get(Uri.parse(
-        'http://192.168.30.103/flutter/load_detail_order_user.php?order_id=$order_id'));
+        'http://192.168.1.9/flutter/load_detail_order_user.php?order_id=$order_id'));
     if (response.statusCode == 200) {
       setState(() {
         detailOrder = json.decode(response.body);
@@ -44,13 +44,30 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
     }
 
     final response = await http.get(Uri.parse(
-        'http://192.168.30.103/flutter/loadProductId.php?product_id=$parsedProductId'));
+        'http://192.168.1.9/flutter/loadProductId.php?product_id=$parsedProductId'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
       throw Exception('Failed to load product details');
     }
   }
+
+  // Future<List<dynamic>> loadUser(int userId) async {
+  //   final parsedUserId = int.tryParse(userId.toString());
+  //   if (parsedUserId == null) {
+  //     return []; // Return empty list if userId is not valid
+  //   }
+
+  //   final response = await http.get(Uri.parse(
+  //       'http://192.168.1.9/flutter/get_user_info.php?user_id=$parsedUserId'));
+  //   if (response.statusCode == 200) {
+  //     return [
+  //       json.decode(response.body)
+  //     ]; // Wrap result in list for consistency
+  //   } else {
+  //     throw Exception('Failed to load user details');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +82,8 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
               itemCount: detailOrder.length,
               itemBuilder: (context, index) {
                 // Ensure productId is correctly parsed to int
+                // int userid =
+                //     int.parse(detailOrder[index]['user_id'].toString()) ?? 0;
                 int productId =
                     int.tryParse(detailOrder[index]["product_id"].toString()) ??
                         0;
@@ -80,7 +99,6 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
                       return Text('Product not found');
                     } else {
                       var product = snapshot.data![0];
-
                       return Card(
                         margin:
                             EdgeInsets.symmetric(vertical: 8, horizontal: 16),

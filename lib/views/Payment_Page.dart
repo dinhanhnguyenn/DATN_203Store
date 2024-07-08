@@ -17,7 +17,7 @@ class Payment extends StatefulWidget {
 }
 
 class _PaymentState extends State<Payment> {
-  String _paymentMethod = 'e_wallet';
+  String _paymentMethod = 'zalopay'; // Chọn phương thức thanh toán ZaloPay
 
   void _onPaymentMethodChanged(String? value) {
     setState(() {
@@ -25,38 +25,43 @@ class _PaymentState extends State<Payment> {
     });
   }
 
-  Future<void> _createMoMoPayment(int orderId) async {
+  Future<void> _createZaloPayPayment(int orderId) async {
     final url =
-        'http://192.168.1.9/flutter/onlinepayment.php'; // Sửa URL thành địa chỉ chính xác của bạn
+        'http://192.168.1.9/flutter/onlinepayment.php'; // Địa chỉ API PHP của bạn
 
-    final response = await http.post(
-      Uri.parse(url),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'partnerCode': 'MOMOBKUN20180529',
-        'accessKey': 'klm05TvNBzhg7h7j',
-        'secretKey': 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa',
-        'orderId': orderId.toString(),
-        'orderInfo': 'Thanh toán qua MoMo',
-        'amount': widget.total.toString(),
-        'ipnUrl': 'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b',
-        'redirectUrl':
-            'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b',
-        'extraData': '',
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'partnerCode': 'YOUR_ZALOPAY_PARTNER_CODE',
+          'accessKey': 'YOUR_ZALOPAY_ACCESS_KEY',
+          'secretKey': 'YOUR_ZALOPAY_SECRET_KEY',
+          'orderId': orderId.toString(),
+          'orderInfo': 'Thanh toán qua ZaloPay',
+          'amount': widget.total.toString(),
+          'ipnUrl': 'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b',
+          'redirectUrl':
+              'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b',
+          'extraData': '',
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      if (jsonResponse['payUrl'] != null) {
-        _launchURL(jsonResponse['payUrl']);
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['payUrl'] != null) {
+          _launchURL(jsonResponse['payUrl']);
+        } else {
+          print('Error creating transaction: ${jsonResponse['message']}');
+        }
       } else {
-        print('Error creating transaction: ${jsonResponse['message']}');
+        print('Failed to create transaction.');
       }
-    } else {
-      print('Failed to create transaction.');
+    } catch (e) {
+      print('Error: $e');
+      // Xử lý lỗi nếu gặp phải
     }
   }
 
@@ -92,13 +97,14 @@ class _PaymentState extends State<Payment> {
               ),
               SizedBox(height: 16),
               ListTile(
-                title: Text('Ví điện tử'),
+                title: Text('ZaloPay'),
                 leading: Radio<String>(
-                  value: 'e_wallet',
+                  value: 'zalopay',
                   groupValue: _paymentMethod,
                   onChanged: _onPaymentMethodChanged,
                 ),
-                trailing: Image.asset('assets/Momo.jpg', width: 50),
+                trailing: Image.asset('assets/ZaloPay_logo.png',
+                    width: 50), // Thay đổi hình ảnh logo ZaloPay của bạn
               ),
               ListTile(
                 title: Text('Thanh toán khi nhận hàng'),
@@ -111,8 +117,8 @@ class _PaymentState extends State<Payment> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  if (_paymentMethod == 'e_wallet') {
-                    _createMoMoPayment(widget.order_id);
+                  if (_paymentMethod == 'zalopay') {
+                    _createZaloPayPayment(widget.order_id);
                   } else {
                     // Xử lý logic thanh toán khi nhận hàng
                   }

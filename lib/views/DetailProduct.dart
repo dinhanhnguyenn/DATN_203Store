@@ -16,7 +16,7 @@ class _DetailProductState extends State<DetailProduct> {
 
   List<String> colors = [];
   Future<void> loadColors() async {
-    final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
+    final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       setState(() {
@@ -118,7 +118,7 @@ class _DetailProductState extends State<DetailProduct> {
                 Stack(
                   children: [
                     Image.network(
-                       "http://192.168.1.6/flutter/uploads/${widget.product["image"]}",
+                       "http://192.168.1.3/flutter/uploads/${widget.product["image"]}",
                       height: 300,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -240,7 +240,7 @@ class _DetailProductState extends State<DetailProduct> {
   }
 
   Future<List> loadProduct() async {
-    final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadColorByProductDetail.php?product_id=${widget.product["product_id"]}'));
+    final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadColorByProductDetail.php?product_id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

@@ -97,7 +97,7 @@ class _AddCategoriesScreenState extends State<AddCategoriesScreen> {
 }
 
 Future categoriesAdd(Category loai) async {
-  final uri = Uri.parse('http://192.168.30.103/flutter/addCategories.php');
+  final uri = Uri.parse('http://192.168.30.35/flutter/addCategories.php');
   print(loai.category_name);
   http.post(uri,
       body: {'category_name': loai.category_name, 'status': loai.status});

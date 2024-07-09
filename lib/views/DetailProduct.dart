@@ -18,10 +18,11 @@ class DetailProduct extends StatefulWidget {
 class _DetailProductState extends State<DetailProduct> {
   List<Map<String, dynamic>> colors = [];
   int? selectedID;
+  List<dynamic> reviews = [];
 
   Future<void> loadColors() async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.9/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
+        'http://192.168.30.35/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       setState(() {
@@ -40,6 +41,7 @@ class _DetailProductState extends State<DetailProduct> {
   @override
   void initState() {
     super.initState();
+    fetchReviewsByProductId(int.parse(widget.product['product_id']));
     loadColors();
   }
 
@@ -60,7 +62,7 @@ class _DetailProductState extends State<DetailProduct> {
       );
       return;
     }
-    final url = Uri.parse('http://192.168.1.9/flutter/add_to_cart.php');
+    final url = Uri.parse('http://192.168.30.35/flutter/add_to_cart.php');
     try {
       final response = await http.post(url, body: {
         'product_id': widget.product['product_id'].toString(),
@@ -116,7 +118,7 @@ class _DetailProductState extends State<DetailProduct> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.9/flutter/addOrder.php'),
+        Uri.parse('http://192.168.30.35/flutter/addOrder.php'),
         body: {
           'user_id': userId.toString(),
           'total': totalPrice.toString(),
@@ -128,7 +130,7 @@ class _DetailProductState extends State<DetailProduct> {
         if (data['status'] == 'success') {
           int orderId = data['order_id'];
           await http.post(
-            Uri.parse('http://192.168.1.9/flutter/addDetailOrder.php'),
+            Uri.parse('http://192.168.30.35/flutter/addDetailOrder.php'),
             body: {
               'order_id': orderId.toString(),
               'product_id': widget.product['product_id'].toString(),
@@ -237,7 +239,7 @@ class _DetailProductState extends State<DetailProduct> {
                 Stack(
                   children: [
                     Image.network(
-                      "http://192.168.1.9/flutter/uploads/${widget.product["image"]}",
+                      "http://192.168.30.35/flutter/uploads/${widget.product["image"]}",
                       height: 300,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -338,6 +340,67 @@ class _DetailProductState extends State<DetailProduct> {
                       const SizedBox(
                         height: 20.0,
                       ),
+                      const Text('Đánh Giá Sản Phẩm',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15.0)),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                            color: const Color(0XFFD9D9D9),
+                            borderRadius: BorderRadius.circular(15)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: reviews.isEmpty
+                                ? [
+                                    Text('Không có đánh giá nào',
+                                        style: TextStyle(fontSize: 15.0)),
+                                  ]
+                                : reviews
+                                    .map((review) => Container(
+                                          margin: EdgeInsets.only(bottom: 10.0),
+                                          padding: EdgeInsets.all(8.0),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.5),
+                                                spreadRadius: 1,
+                                                blurRadius: 5,
+                                                offset: Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text('${review['username']}',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                      'Đánh Gía : ${review['rating']}',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  Icon(Icons.star)
+                                                ],
+                                              ),
+                                              Text('${review['comment']}'),
+                                            ],
+                                          ),
+                                        ))
+                                    .toList(),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -349,13 +412,28 @@ class _DetailProductState extends State<DetailProduct> {
     );
   }
 
-  Future<List> loadProduct() async {
-    final response = await http.get(Uri.parse(
-        'http://192.168.1.103/flutter/loadColorByProductDetail.php?product_id=${widget.product["product_id"]}'));
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Load thất bại');
+  Future<void> fetchReviewsByProductId(int productId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.30.35/flutter/loadReviewbyProduct.php'),
+        body: {
+          'product_id': productId.toString(),
+          'status': '1', // Chỉ lấy những đánh giá có status = 1
+        },
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        setState(() {
+          reviews = json.decode(response.body);
+        });
+      } else {
+        throw Exception('Failed to load reviews');
+      }
+    } catch (e) {
+      print('Error: $e');
     }
   }
 }

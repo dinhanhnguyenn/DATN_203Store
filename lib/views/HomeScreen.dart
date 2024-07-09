@@ -168,7 +168,7 @@ class HomeScreen extends StatelessWidget {
                                   Expanded(
                                     child: Center(
                                       child: Image.network(
-                                        "http://192.168.1.9/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.30.35/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -216,7 +216,7 @@ class HomeScreen extends StatelessWidget {
 
   Future<List> loadProduct() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.9/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.30.35/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

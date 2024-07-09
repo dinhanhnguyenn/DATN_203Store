@@ -27,7 +27,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> _getUserInfo() async {
     userId = Provider.of<UserProvider>(context, listen: false).userId;
     final response = await http.post(
-      Uri.parse('http://192.168.1.9/flutter/get_user_info.php'),
+      Uri.parse('http://192.168.30.35/flutter/get_user_info.php'),
       body: {'user_id': userId.toString()},
     );
 

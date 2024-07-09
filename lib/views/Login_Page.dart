@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:app_203store/models/CartProdvider.dart';
 import 'package:app_203store/models/UserProvider.dart';
+import 'package:app_203store/views/AdminScreen.dart';
 import 'package:app_203store/views/ForgetPass_Page.dart';
 import 'package:app_203store/views/MainScreen.dart';
 import 'package:app_203store/views/Register_Page.dart';
@@ -22,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login(BuildContext context) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.9/flutter/login.php'),
+      Uri.parse('http://192.168.30.35/flutter/login.php'),
       body: {
         'email': _emailController.text,
         'password': _passwordController.text,
@@ -41,17 +42,24 @@ class _LoginPageState extends State<LoginPage> {
         final userName = jsonResponse['username'];
         final userEmail = jsonResponse['email'];
         final userFullName = jsonResponse['full_name'];
-        final idCart = jsonResponse['id_cart']; // Lấy id_cart từ response
+        final userRole =
+            jsonResponse['role']; // Thêm lấy vai trò của user từ response
 
-        // Cập nhật thông tin user và id_cart vào Provider
-        Provider.of<CartProvider>(context, listen: false).setIdCart(idCart);
+        // Cập nhật thông tin user vào Provider
         Provider.of<UserProvider>(context, listen: false).setUserId(userId);
 
-        // Điều hướng đến màn hình chính
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
-        );
+        // Điều hướng đến màn hình tương ứng với vai trò
+        if (userRole == 'admin') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AdminScreen()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreen()),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(jsonResponse['message'])),
@@ -66,9 +74,14 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    int userId = Provider.of<UserProvider>(context).userId;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         backgroundColor: Colors.lightBlue[200],
       ),
       body: SingleChildScrollView(

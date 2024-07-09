@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:app_203store/views/MainScreen.dart';
 import 'package:app_203store/views/ReviewOrder.dart';
 import 'package:app_203store/views/detail_order_User.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,7 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
     });
 
     final response = await http.get(Uri.parse(
-        'http://192.168.1.9/flutter/loadorderUser.php?user_id=${widget.user_id}'));
+        'http://192.168.30.35/flutter/loadorderUser.php?user_id=${widget.user_id}'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -51,7 +52,7 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
   Future<void> cancelOrder(int orderId) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.9/flutter/updateOrderStatus.php'),
+        Uri.parse('http://192.168.30.35/flutter/updateOrderStatus.php'),
         body: {
           'order_id': orderId.toString(),
           'status': 'cancelled',
@@ -179,6 +180,16 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MainScreen(),
+                ));
+          },
+          icon: Icon(Icons.arrow_back),
+        ),
         title: Text("Lịch Sử Mua Hàng"),
         bottom: TabBar(
           controller: _tabController,

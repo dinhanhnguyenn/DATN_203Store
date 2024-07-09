@@ -16,6 +16,12 @@ class _AccountManagerScreenState extends State<AccountManagerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           backgroundColor: Colors.lightBlue[200],
           title: const Text("Quản lý tài khoản"),
         ),
@@ -108,7 +114,7 @@ class _AccountManagerScreenState extends State<AccountManagerScreen> {
 
   Future<List> loadAccountByAdmin() async {
     final response = await http
-        .get(Uri.parse('http://192.168.30.103/flutter/loadAccount.php'));
+        .get(Uri.parse('http://192.168.30.35/flutter/loadAccount.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -117,7 +123,7 @@ class _AccountManagerScreenState extends State<AccountManagerScreen> {
   }
 
   Future userDelete(User pro) async {
-    final uri = Uri.parse('http://192.168.30.103/flutter/deleteAccount.php');
+    final uri = Uri.parse('http://192.168.30.35/flutter/deleteAccount.php');
     var request = http.MultipartRequest('POST', uri);
 
     request.fields['user_id'] = pro.user_id;

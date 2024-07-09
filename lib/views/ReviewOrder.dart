@@ -16,18 +16,16 @@ class _ReviewOrderState extends State<ReviewOrder> {
   final _formKey = GlobalKey<FormState>();
   final _reviewController = TextEditingController();
   int _rating = 0;
-  // Inside _ReviewOrderState class
-  int product_id = 0; // Initialize product_id
+  int product_id = 0;
 
   Future<void> fetchProductID(int orderId) async {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://192.168.1.9/flutter/loadDetail_order.php?order_id=$orderId'),
+            'http://192.168.30.35/flutter/loadDetail_order.php?order_id=$orderId'),
       );
 
       if (response.statusCode == 200) {
-        // Parse product_id from the response
         setState(() {
           product_id = int.parse(response.body.trim());
         });
@@ -50,7 +48,7 @@ class _ReviewOrderState extends State<ReviewOrder> {
     String formattedDate = '${now.year}-${now.month}-${now.day}';
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.9/flutter/submitReview.php'),
+        Uri.parse('http://192.168.30.35/flutter/submitReview.php'),
         body: {
           'time': formattedDate,
           'user_id': user_id.toString(),
@@ -64,7 +62,7 @@ class _ReviewOrderState extends State<ReviewOrder> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Đánh giá đã được gửi thành công!')),
         );
-        Navigator.pop(context); // Đóng màn hình đánh giá khi thành công
+        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Gửi đánh giá thất bại. Vui lòng thử lại!')),

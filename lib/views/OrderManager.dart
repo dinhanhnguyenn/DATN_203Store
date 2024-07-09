@@ -31,7 +31,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
 
     try {
       final response = await http
-          .get(Uri.parse('http://192.168.1.9/flutter/LoadOrderManager.php'));
+          .get(Uri.parse('http://192.168.30.35/flutter/LoadOrderManager.php'));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -56,7 +56,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
       int orderId, String newStatus, String newPaymentStatus) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.9/flutter/updateOrderStatus.php'),
+        Uri.parse('http://192.168.30.35/flutter/updateOrderStatus.php'),
         body: {
           'order_id': orderId.toString(),
           'status': newStatus,
@@ -172,6 +172,12 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: Text("Quản Lí Đơn Hàng"),
         bottom: TabBar(
           controller: _tabController,

@@ -27,7 +27,7 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
     }
 
     final response = await http.get(Uri.parse(
-        'http://192.168.1.9/flutter/load_detail_order_user.php?order_id=$order_id'));
+        'http://192.168.30.35/flutter/load_detail_order_user.php?order_id=$order_id'));
     if (response.statusCode == 200) {
       setState(() {
         detailOrder = json.decode(response.body);
@@ -44,7 +44,7 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
     }
 
     final response = await http.get(Uri.parse(
-        'http://192.168.1.9/flutter/loadProductId.php?product_id=$parsedProductId'));
+        'http://192.168.30.35/flutter/loadProductId.php?product_id=$parsedProductId'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -59,7 +59,7 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
   //   }
 
   //   final response = await http.get(Uri.parse(
-  //       'http://192.168.1.9/flutter/get_user_info.php?user_id=$parsedUserId'));
+  //       'http://192.168.30.35/flutter/get_user_info.php?user_id=$parsedUserId'));
   //   if (response.statusCode == 200) {
   //     return [
   //       json.decode(response.body)

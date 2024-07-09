@@ -31,6 +31,12 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           backgroundColor: Colors.lightBlue[200],
           title: const Text("Quản lý sản phẩm"),
         ),
@@ -89,7 +95,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                                 width: 100,
                                 height: 100,
                                 child: Image.network(
-                                    "http://192.168.30.103/flutter/uploads/${productListByAdmin[index]["image"]}",
+                                    "http://192.168.30.35/flutter/uploads/${productListByAdmin[index]["image"]}",
                                     fit: BoxFit.cover),
                               ),
                             ),
@@ -173,7 +179,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
 
 Future<List> loadProductByAdmin() async {
   final response = await http
-      .get(Uri.parse('http://192.168.30.103/flutter/loadProductByAdmin.php'));
+      .get(Uri.parse('http://192.168.30.35/flutter/loadProductByAdmin.php'));
   if (response.statusCode == 200) {
     return json.decode(response.body);
   } else {
@@ -182,7 +188,7 @@ Future<List> loadProductByAdmin() async {
 }
 
 Future productDelete(Product pro) async {
-  final uri = Uri.parse('http://192.168.30.103/flutter/deleteProduct.php');
+  final uri = Uri.parse('http://192.168.30.35/flutter/deleteProduct.php');
   var request = http.MultipartRequest('POST', uri);
 
   request.fields['product_id'] = pro.product_id;

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app_203store/views/AccountScreen.dart';
+import 'package:app_203store/views/MainScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -136,7 +137,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   Future<void> updateUserInfo(
       String username, String fullName, String phone, String address) async {
     final url = Uri.parse(
-        'http://192.168.30.103/flutter/update_user_info.php'); // Thay đổi thành URL của API PHP của bạn
+        'http://192.168.30.35/flutter/update_user_info.php'); // Thay đổi thành URL của API PHP của bạn
     final response = await http.post(
       url,
       body: {
@@ -153,8 +154,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Cập nhật thông tin thành công')),
       );
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => AccountScreen()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
+      );
     } else {
       // Xử lý khi có lỗi từ phía server
       ScaffoldMessenger.of(context).showSnackBar(

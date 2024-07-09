@@ -1,20 +1,17 @@
 import 'dart:convert';
+
 import 'package:app_203store/models/CategoriesItem.dart';
+import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/DetailProduct.dart';
 import 'package:app_203store/views/SearchScreen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
   final List<String> imagelist = [
     "assets/1.jpg",
     "assets/2.jpg",
@@ -29,64 +26,62 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.lightBlue[200],
-        title:Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 7.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          backgroundColor: Colors.lightBlue[200],
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 7.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "203 Store",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                          color: Colors.blue),
+                    ),
+                    Text(
+                      "Cung cấp các sản phẩm Apple chính hãng",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    )
+                  ],
+                ),
+              ),
+              Row(
                 children: [
-                  Text(
-                    "203 Store",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25,
-                      color: Colors.blue
-                    ),
+                  Container(
+                    color: Colors.transparent,
+                    child: IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SearchScreen()));
+                        },
+                        icon: const Icon(
+                          Icons.search,
+                          color: Colors.black,
+                        )),
                   ),
-                  Text(
-                    "Cung cấp các sản phẩm Apple chính hãng",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13
-                    ),
+                  Container(
+                    color: Colors.transparent,
+                    child: IconButton(
+                        onPressed: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => Cart()));
+                        },
+                        icon: const Icon(
+                          Icons.shopping_cart_outlined,
+                          color: Colors.black,
+                        )),
                   )
                 ],
-              ),
-            ),
-            Row(
-              children: [
-                Container(
-                  color: Colors.transparent,
-                  child: IconButton(
-                    onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => SearchScreen()));
-                    },
-                    icon: const Icon(
-                      Icons.search,
-                      color: Colors.black,
-                    )
-                  ),
-                ),
-                Container(
-                  color: Colors.transparent,
-                  child: IconButton(
-                    onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) =>  Cart()));
-                    },
-                    icon: const Icon(
-                      Icons.shopping_cart_outlined,
-                      color: Colors.black,
-                    )
-                  ),
-                )
-              ],
-            )
-          ],
-        )
-      ),
+              )
+            ],
+          )),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -103,9 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   autoPlayInterval: const Duration(seconds: 3),
                   autoPlayAnimationDuration: const Duration(milliseconds: 800),
                   autoPlayCurve: Curves.fastOutSlowIn,
-                  onPageChanged: (index, reason) {
-                    
-                  },
+                  onPageChanged: (index, reason) {},
                 ),
                 items: imagelist.map((imagePath) {
                   return Builder(
@@ -146,7 +139,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: GridView.builder(
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 8.0,
                         mainAxisSpacing: 8.0,
@@ -159,7 +153,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => DetailProduct(product: productList[index]),
+                                builder: (context) =>
+                                    DetailProduct(product: productList[index]),
                               ),
                             );
                           },
@@ -167,14 +162,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: const Color(0xFFD9D9D9),
                             elevation: 7.0,
                             child: ListTile(
-                              subtitle: Column(               
+                              subtitle: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Expanded(
-                    
                                     child: Center(
                                       child: Image.network(
-                                        "http://192.168.1.3/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.4/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -191,7 +185,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                   Padding(
-                                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                                    padding: const EdgeInsets.only(
+                                        top: 5, bottom: 5),
                                     child: Text(
                                       ' ${productList[index]["price"]} VND',
                                       style: const TextStyle(
@@ -220,7 +215,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<List> loadProduct() async {
-    final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadProduct.php'));
+    final response = await http
+        .get(Uri.parse('http://192.168.1.4/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

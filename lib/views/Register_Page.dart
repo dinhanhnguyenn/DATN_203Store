@@ -28,26 +28,36 @@ class _RegisterState extends State<Register> {
       return;
     }
 
-    final response = await http.post(
-      Uri.parse('http://192.168.1.6/flutter/register.php'),
-      body: {
-        'email': email,
-        'password': password,
-      },
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.1.4/flutter/register.php'),
+        body: {
+          'email': email,
+          'password': password,
+        },
+      );
 
-    final data = jsonDecode(response.body);
-    if (data['success']) {
+      final data = jsonDecode(response.body);
+      if (data['success']) {
+        final userId = data['user_id']; // Lấy user_id từ phản hồi
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Đăng ký thành công.')),
+        );
+
+        // Điều hướng tới trang đăng nhập hoặc trang khác nếu cần
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'])),
+        );
+      }
+    } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đăng ký thành công')),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(data['message'])),
+        SnackBar(content: Text('Đăng ký không thành công: $error')),
       );
     }
   }
@@ -55,44 +65,44 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.lightBlue[200],
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+      appBar: AppBar(
+        backgroundColor: Colors.lightBlue[200],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 250,
-                  width: 450,
-                  child: Image.asset("assets/login.jpg"),
-                ),
-                const Row(
-                  children: [
-                    Text(
-                      "Xin Chào,",
-                      style: TextStyle(fontSize: 30),
-                    )
-                  ],
-                ),
-                const Row(
-                  children: [Text("Tạo tài khoản để mua sắm nào  !")],
-                ),
-                const SizedBox(
-                  height: 8.0,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                        child: TextField(
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 250,
+                width: 450,
+                child: Image.asset("assets/login.jpg"),
+              ),
+              const Row(
+                children: [
+                  Text(
+                    "Xin Chào,",
+                    style: TextStyle(fontSize: 30),
+                  )
+                ],
+              ),
+              const Row(
+                children: [Text("Tạo tài khoản để mua sắm nào  !")],
+              ),
+              const SizedBox(
+                height: 8.0,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
@@ -101,16 +111,17 @@ class _RegisterState extends State<Register> {
                         ),
                         hintText: "Email",
                       ),
-                    ))
-                  ],
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                        child: TextField(
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
                       controller: _passwordController,
                       obscureText: true,
                       keyboardType: TextInputType.text,
@@ -120,16 +131,17 @@ class _RegisterState extends State<Register> {
                         ),
                         hintText: "Password",
                       ),
-                    ))
-                  ],
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                        child: TextField(
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
                       controller: _confirmPasswordController,
                       obscureText: true,
                       keyboardType: TextInputType.text,
@@ -139,34 +151,37 @@ class _RegisterState extends State<Register> {
                         ),
                         hintText: "Confirm Password",
                       ),
-                    ))
-                  ],
-                ),
-                const SizedBox(
-                  height: 8.0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 40),
-                          backgroundColor: Colors.lightBlue[200]),
-                      onPressed: register,
-                      child: const Text(
-                        "Đăng Ký",
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 8.0,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
-                    )
-                  ],
-                ),
-              ],
-            ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 40),
+                      backgroundColor: Colors.lightBlue[200],
+                    ),
+                    onPressed: register,
+                    child: const Text(
+                      "Đăng Ký",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

@@ -16,9 +16,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.lightBlue[200],
-        title: Text("${widget.category["category_name"]}")
-      ),
+          backgroundColor: Colors.lightBlue[200],
+          title: Text("${widget.category["category_name"]}")),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -30,7 +29,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No data available'));
+                  return const Center(child: Text('Không có sản phẩm'));
                 } else {
                   List<dynamic> productList = snapshot.data!;
                   return Padding(
@@ -50,7 +49,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => DetailProduct(product: productList[index]),
+                                builder: (context) =>
+                                    DetailProduct(product: productList[index]),
                               ),
                             );
                           },
@@ -58,14 +58,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             color: const Color(0xFFD9D9D9),
                             elevation: 7.0,
                             child: ListTile(
-                              subtitle: Column(               
+                              subtitle: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Expanded(
-                    
                                     child: Center(
                                       child: Image.network(
-                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.4/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -82,7 +81,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                     ),
                                   ),
                                   Padding(
-                                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                                    padding: const EdgeInsets.only(
+                                        top: 5, bottom: 5),
                                     child: Text(
                                       ' ${productList[index]["price"]} VND',
                                       style: const TextStyle(
@@ -109,8 +109,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
       ),
     );
   }
+
   Future<List> loadProductByCategory() async {
-    final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadProductByCategory.php?category_id=${widget.category["category_id"]}'));
+    final response = await http.get(Uri.parse(
+        'http://192.168.1.4/flutter/loadProductByCategory.php?category_id=${widget.category["category_id"]}'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -118,4 +120,3 @@ class _CategoryScreenState extends State<CategoryScreen> {
     }
   }
 }
-

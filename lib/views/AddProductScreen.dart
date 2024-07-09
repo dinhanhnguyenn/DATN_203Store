@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:app_203store/models/Product.dart';
+import 'package:app_203store/models/UserProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class AddProductsScreen extends StatefulWidget {
   const AddProductsScreen({super.key});
@@ -14,9 +16,14 @@ class AddProductsScreen extends StatefulWidget {
 }
 
 class _AddProductsScreenState extends State<AddProductsScreen> {
-
-  Product newproduct =
-      Product(product_id: "", name: "", image: "", price: "", category_id: "", description: "",status: "");
+  Product newproduct = Product(
+      product_id: "",
+      name: "",
+      image: "",
+      price: "",
+      category_id: "",
+      description: "",
+      status: "");
   var tensp = TextEditingController();
   var dongiasp = TextEditingController();
   var mota = TextEditingController();
@@ -31,7 +38,8 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
   }
 
   Future<void> loadCategories() async {
-    final response = await http.get(Uri.parse('http://192.168.1.6/flutter/loadCategories.php'));
+    final response = await http
+        .get(Uri.parse('http://192.168.1.4/flutter/loadCategories.php'));
     if (response.statusCode == 200) {
       setState(() {
         categoryList = json.decode(response.body);
@@ -54,48 +62,46 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.lightBlue[200],
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context, true);
-          },
-          icon: const Icon(Icons.arrow_back),
+        appBar: AppBar(
+          backgroundColor: Colors.lightBlue[200],
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+          title: const Text("Thêm Sản Phẩm"),
         ),
-        title: const Text("Thêm Sản Phẩm"),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, 
-            children: [
-             GestureDetector(
-                onTap: () async {
-                  await choiceImage();
-                },
-                child: Container(
-                  width: 150,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: _image == null
-                      ? Center(
-                          child: Text('',
-                              style: TextStyle(color: Colors.grey[600])))
-                      : Image.file(_image!, fit: BoxFit.cover),
-                )
-              ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              GestureDetector(
+                  onTap: () async {
+                    await choiceImage();
+                  },
+                  child: Container(
+                    width: 150,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: _image == null
+                        ? Center(
+                            child: Text('',
+                                style: TextStyle(color: Colors.grey[600])))
+                        : Image.file(_image!, fit: BoxFit.cover),
+                  )),
               const SizedBox(
                 height: 12,
               ),
@@ -201,8 +207,8 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                 width: MediaQuery.of(context).size.width,
                 height: 62.0,
                 decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadius.circular(10.0), // Set your desired border radius here
+                  borderRadius: BorderRadius.circular(
+                      10.0), // Set your desired border radius here
                   border: Border.all(
                     color: Colors.grey,
                     width: 1.0,
@@ -210,21 +216,22 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: categoryList.isEmpty
-                ? CircularProgressIndicator()
-                : DropdownButtonFormField<String>(
-                  value: loai,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      loai = newValue;
-                    });
-                  },
-                  items: categoryList.map<DropdownMenuItem<String>>((dynamic item) {
-                    return DropdownMenuItem<String>(
-                      value: item['category_id'].toString(),
-                      child: Text(item['category_name']),
-                    );
-                  }).toList(),
-                ),
+                    ? CircularProgressIndicator()
+                    : DropdownButtonFormField<String>(
+                        value: loai,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            loai = newValue;
+                          });
+                        },
+                        items: categoryList
+                            .map<DropdownMenuItem<String>>((dynamic item) {
+                          return DropdownMenuItem<String>(
+                            value: item['category_id'].toString(),
+                            child: Text(item['category_name']),
+                          );
+                        }).toList(),
+                      ),
               ),
               const SizedBox(
                 height: 16,
@@ -235,15 +242,14 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       Product add = Product(
-                        product_id: "",
-                        name: tensp.text, 
-                        image: _image?.path ?? "", 
-                        price: dongiasp.text,
-                        category_id: loai!,
-                        description: mota.text,
-                        status: 1.toString()
-                      );
-                       productAdd(add);
+                          product_id: "",
+                          name: tensp.text,
+                          image: _image?.path ?? "",
+                          price: dongiasp.text,
+                          category_id: loai!,
+                          description: mota.text,
+                          status: 1.toString());
+                      productAdd(add);
                     },
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(180, 60),
@@ -267,7 +273,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
 }
 
 Future productAdd(Product pro) async {
-  final uri = Uri.parse('http://192.168.1.6/flutter/addProduct.php');
+  final uri = Uri.parse('http://192.168.1.4/flutter/addProduct.php');
   var request = http.MultipartRequest('POST', uri);
   request.fields['name'] = pro.name;
   request.fields['price'] = pro.price;
@@ -289,5 +295,3 @@ Future productAdd(Product pro) async {
     print("Thêm thất bại");
   }
 }
-
-

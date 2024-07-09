@@ -12,8 +12,8 @@ class AddProductDetailScreen extends StatefulWidget {
 }
 
 class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
-
-  ProductDetail newPro = ProductDetail(pro_id: "", product_id: "", color_id: "", quantity: "", status: "");
+  ProductDetail newPro = ProductDetail(
+      pro_id: "", product_id: "", color_id: "", quantity: "", status: "");
 
   var soluong = TextEditingController();
 
@@ -31,7 +31,8 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
   }
 
   Future<void> loadProducts() async {
-    final response = await http.get(Uri.parse('http://192.168.1.15/flutter/loadProduct.php'));
+    final response = await http
+        .get(Uri.parse('http://192.168.1.4/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       setState(() {
         productList = json.decode(response.body);
@@ -41,8 +42,9 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
     }
   }
 
-   Future<void> loadColors() async {
-    final response = await http.get(Uri.parse('http://192.168.1.15/flutter/loadColor.php'));
+  Future<void> loadColors() async {
+    final response = await http
+        .get(Uri.parse('http://192.168.1.4/flutter/loadColor.php'));
     if (response.statusCode == 200) {
       setState(() {
         colorList = json.decode(response.body);
@@ -55,22 +57,21 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.lightBlue[200],
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context, true);
-          },
-          icon: const Icon(Icons.arrow_back),
+        appBar: AppBar(
+          backgroundColor: Colors.lightBlue[200],
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+          title: const Text("Nhập hàng"),
         ),
-        title: const Text("Nhập hàng"),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, 
-            children: [
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               const Row(
                 children: [
                   Expanded(
@@ -89,8 +90,8 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
                 width: MediaQuery.of(context).size.width,
                 height: 62.0,
                 decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadius.circular(10.0), // Set your desired border radius here
+                  borderRadius: BorderRadius.circular(
+                      10.0), // Set your desired border radius here
                   border: Border.all(
                     color: Colors.grey,
                     width: 1.0,
@@ -98,21 +99,22 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: productList.isEmpty
-                ? CircularProgressIndicator()
-                : DropdownButtonFormField<String>(
-                  value: product,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      product = newValue;
-                    });
-                  },
-                  items: productList.map<DropdownMenuItem<String>>((dynamic item) {
-                    return DropdownMenuItem<String>(
-                      value: item['product_id'].toString(),
-                      child: Text(item['name']),
-                    );
-                  }).toList(),
-                ),
+                    ? CircularProgressIndicator()
+                    : DropdownButtonFormField<String>(
+                        value: product,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            product = newValue;
+                          });
+                        },
+                        items: productList
+                            .map<DropdownMenuItem<String>>((dynamic item) {
+                          return DropdownMenuItem<String>(
+                            value: item['product_id'].toString(),
+                            child: Text(item['name']),
+                          );
+                        }).toList(),
+                      ),
               ),
               const Row(
                 children: [
@@ -132,8 +134,8 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
                 width: MediaQuery.of(context).size.width,
                 height: 62.0,
                 decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadius.circular(10.0), // Set your desired border radius here
+                  borderRadius: BorderRadius.circular(
+                      10.0), // Set your desired border radius here
                   border: Border.all(
                     color: Colors.grey,
                     width: 1.0,
@@ -141,21 +143,22 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: colorList.isEmpty
-                ? CircularProgressIndicator()
-                : DropdownButtonFormField<String>(
-                  value: color,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      color = newValue;
-                    });
-                  },
-                  items: colorList.map<DropdownMenuItem<String>>((dynamic item) {
-                    return DropdownMenuItem<String>(
-                      value: item['color_id'].toString(),
-                      child: Text(item['color_name']),
-                    );
-                  }).toList(),
-                ),
+                    ? CircularProgressIndicator()
+                    : DropdownButtonFormField<String>(
+                        value: color,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            color = newValue;
+                          });
+                        },
+                        items: colorList
+                            .map<DropdownMenuItem<String>>((dynamic item) {
+                          return DropdownMenuItem<String>(
+                            value: item['color_id'].toString(),
+                            child: Text(item['color_name']),
+                          );
+                        }).toList(),
+                      ),
               ),
               const Row(
                 children: [
@@ -193,12 +196,11 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
                       print(product);
                       print(color);
                       ProductDetail add = ProductDetail(
-                        pro_id: "", 
-                        product_id: product!, 
-                        color_id: color!, 
-                        quantity: soluong.text, 
-                        status: 1.toString()
-                      );
+                          pro_id: "",
+                          product_id: product!,
+                          color_id: color!,
+                          quantity: soluong.text,
+                          status: 1.toString());
                       productDetailAdd(add);
                     },
                     style: ElevatedButton.styleFrom(
@@ -223,7 +225,7 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
 }
 
 Future productDetailAdd(ProductDetail pro) async {
-  final uri = Uri.parse('http://192.168.1.6/flutter/addProductDetail.php');
+  final uri = Uri.parse('http://192.168.1.4/flutter/addProductDetail.php');
   var request = http.MultipartRequest('POST', uri);
   request.fields['product_id'] = pro.product_id;
   request.fields['color_id'] = pro.color_id;

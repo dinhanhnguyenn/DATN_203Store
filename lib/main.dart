@@ -1,3 +1,4 @@
+import 'package:app_203store/models/CartProdvider.dart';
 import 'package:app_203store/views/AccountScreen.dart';
 import 'package:app_203store/views/AddProductDetail.dart';
 import 'package:app_203store/views/AddProductScreen.dart';
@@ -9,13 +10,23 @@ import 'package:app_203store/views/HomeScreen.dart';
 import 'package:app_203store/views/Login_Page.dart';
 import 'package:app_203store/views/MainScreen.dart';
 import 'package:app_203store/views/NotificationsScreen.dart';
-import 'package:app_203store/views/ProductsManagerScreen.dart';
+import 'package:app_203store/views/Payment_Page.dart';
 import 'package:app_203store/views/Register_Page.dart';
 import 'package:app_203store/views/UpdateProductsScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app_203store/models/UserProvider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider(0)),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -25,19 +36,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      initialRoute: '/admin',
       routes: {
-        '/': (context) => const MainScreen(),
-        '/login': (context) => const LoginPage(),
-        '/register': (context) => const Register(),
-        '/home':(context) => const HomeScreen(),
-        '/notifi':(context) => const NotificationsScreen(),
-        '/profile': (context) => const AccountScreen(),
+        '/login': (context) => LoginPage(),
+        '/register': (context) => Register(),
+        '/': (context) => MainScreen(),
+        '/home': (context) => HomeScreen(),
+        '/notifi': (context) => const NotificationsScreen(),
         '/addproduct': (context) => const AddProductsScreen(),
-        '/productmanager': (context) => const ProductManagerScreen(),
-        '/categorymanager':(context) => const CategoriesManagerScreen(),
-        '/admin':(context) => const AdminScreen(),
-        '/addproductdetail':(context) => const AddProductDetailScreen()
+        '/cart': (context) => const Cart(),
+        '/admin':(context) => const AdminScreen()
       },
     );
   }

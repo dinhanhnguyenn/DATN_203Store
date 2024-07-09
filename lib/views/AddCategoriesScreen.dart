@@ -13,7 +13,6 @@ class AddCategoriesScreen extends StatefulWidget {
 }
 
 class _AddCategoriesScreenState extends State<AddCategoriesScreen> {
-
   Category newcategory =
       Category(category_id: "", category_name: "", status: "");
   var loai = TextEditingController();
@@ -21,22 +20,21 @@ class _AddCategoriesScreenState extends State<AddCategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.lightBlue[200],
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context, true);
-          },
-          icon: const Icon(Icons.arrow_back),
+        appBar: AppBar(
+          backgroundColor: Colors.lightBlue[200],
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+          title: const Text("Thêm danh mục"),
         ),
-        title: const Text("Thêm danh mục"),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, 
-            children: [
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               const Row(
                 children: [
                   Expanded(
@@ -71,11 +69,10 @@ class _AddCategoriesScreenState extends State<AddCategoriesScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       Category add = Category(
-                        category_id: "", 
-                        category_name: loai.text, 
-                        status: 1.toString()
-                      );
-                     
+                          category_id: "",
+                          category_name: loai.text,
+                          status: 1.toString());
+
                       categoriesAdd(add);
                     },
                     style: ElevatedButton.styleFrom(
@@ -100,12 +97,8 @@ class _AddCategoriesScreenState extends State<AddCategoriesScreen> {
 }
 
 Future categoriesAdd(Category loai) async {
-  final uri = Uri.parse('http://192.168.1.15/flutter/addCategories.php');
+  final uri = Uri.parse('http://192.168.1.4/flutter/addCategories.php');
   print(loai.category_name);
-  http.post(uri,body: {
-      'category_name' :loai.category_name,
-      'status':loai.status
-  });
+  http.post(uri,
+      body: {'category_name': loai.category_name, 'status': loai.status});
 }
-
-

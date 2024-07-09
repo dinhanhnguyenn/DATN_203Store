@@ -1,26 +1,36 @@
 import 'dart:convert';
-import 'package:app_203store/models/Product.dart';
+import 'package:app_203store/models/CartProdvider.dart';
+import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/Payment_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class DetailProduct extends StatefulWidget {
-   DetailProduct({super.key, required this.product});
-   var product;
+  DetailProduct({Key? key, required this.product}) : super(key: key);
+  final Map<String, dynamic> product;
+
   @override
   State<DetailProduct> createState() => _DetailProductState();
 }
 
 class _DetailProductState extends State<DetailProduct> {
+  List<Map<String, dynamic>> colors = [];
+  int? selectedID;
 
-  List<String> colors = [];
   Future<void> loadColors() async {
-    final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
+    final response = await http.get(Uri.parse(
+        'http://192.168.1.4/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       setState(() {
-        colors = data.map((item) => item['color_name'] as String).toList();
+        colors = data
+            .map((item) => {
+                  'color_id': item['color_id'],
+                  'color_name': item['color_name']
+                })
+            .toList();
       });
     } else {
       throw Exception('Load thất bại');
@@ -33,15 +43,131 @@ class _DetailProductState extends State<DetailProduct> {
     loadColors();
   }
 
+  Future<void> addToCart() async {
+    int userId = Provider.of<UserProvider>(context, listen: false).userId;
+    if (userId == 0) {
+      // Nếu userId = 0, yêu cầu người dùng đăng nhập
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vui lòng đăng nhập để thêm vào giỏ hàng')),
+      );
+      return;
+    }
+    int idCart = Provider.of<CartProvider>(context, listen: false).idCart;
+    if (selectedID == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Vui lòng chọn màu sắc trước khi thêm vào giỏ hàng')),
+      );
+      return;
+    }
+    final url = Uri.parse('http://192.168.1.4/flutter/add_to_cart.php');
+    try {
+      final response = await http.post(url, body: {
+        'product_id': widget.product['product_id'].toString(),
+        'price': widget.product["price"].toString(),
+        'quantity': '1',
+        'id_cart': idCart.toString(),
+        'id_color': selectedID.toString()
+      });
+
+      if (response.statusCode == 200) {
+        final responseBody = response.body;
+        print(
+            'Response body: $responseBody'); // Thêm dòng này để in nội dung phản hồi
+        final data = json.decode(responseBody);
+        if (data['status'] == 'success') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Cart()),
+          );
+        } else if (data['status'] == 'exists') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Sản phẩm đã có trong giỏ hàng')),
+          );
+        } else {
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //       content: Text('Failed to add to cart: ${data['message']}')),
+          // );
+        }
+      } else {
+        print('Failed to load data with status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Failed to connect')),
+      // );
+    }
+  }
+
+  Future<void> _createOrder() async {
+    int userId = Provider.of<UserProvider>(context, listen: false).userId;
+    if (userId == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vui lòng đăng nhập để thêm vào giỏ hàng')),
+      );
+      return;
+    }
+
+    double totalPrice = double.parse(widget.product['price']);
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.1.4/flutter/addOrder.php'),
+        body: {
+          'user_id': userId.toString(),
+          'total': totalPrice.toString(),
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == 'success') {
+          int orderId = data['order_id'];
+          await http.post(
+            Uri.parse('http://192.168.1.4/flutter/addDetailOrder.php'),
+            body: {
+              'order_id': orderId.toString(),
+              'product_id': widget.product['product_id'].toString(),
+              'quantity': '1',
+              'id_color': selectedID.toString()
+            },
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Payment(
+                      order_id: orderId,
+                      total: totalPrice,
+                    )),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Lỗi: ${data['message']}')),
+          );
+        }
+      } else {
+        print(
+            'Failed to create order with status code: ${response.statusCode}');
+        throw Exception('Failed to create order');
+      }
+    } catch (e) {
+      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi không xác định')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: (){},
-        child: Icon(
-          Icons.phone_in_talk, 
-          color: Colors.white
-        ),
+        onPressed: () {},
+        child: Icon(Icons.phone_in_talk, color: Colors.white),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
@@ -55,30 +181,27 @@ class _DetailProductState extends State<DetailProduct> {
             child: MaterialButton(
               color: const Color(0xFF8E8E8E),
               onPressed: () {
-                Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Cart()));
+                addToCart();
               },
               child: Container(
-                alignment: Alignment.center,
-                height: 70,
-                child: const Center(
-                  child: Text(
-                    'Thêm vào giỏ hàng',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15
+                  alignment: Alignment.center,
+                  height: 70,
+                  child: const Center(
+                    child: Text(
+                      'Thêm vào giỏ hàng',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15),
                     ),
-                  ),
-                )
-              ),
+                  )),
             ),
           ),
           Expanded(
             child: MaterialButton(
               color: Colors.red,
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const Payment()));
+                _createOrder();
               },
               child: Container(
                 alignment: Alignment.center,
@@ -89,17 +212,13 @@ class _DetailProductState extends State<DetailProduct> {
                     Text(
                       'MUA NGAY',
                       style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17
-                      ),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17),
                     ),
                     Text(
                       'Giao tận nơi',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ],
                 ),
@@ -118,24 +237,23 @@ class _DetailProductState extends State<DetailProduct> {
                 Stack(
                   children: [
                     Image.network(
-                       "http://192.168.1.3/flutter/uploads/${widget.product["image"]}",
+                      "http://192.168.1.4/flutter/uploads/${widget.product["image"]}",
                       height: 300,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
                     Positioned(
-                      top: 8.0,
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.black,
-                          size: 24.0,
-                        ),
-                      )
-                    ),
+                        top: 8.0,
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.black,
+                            size: 24.0,
+                          ),
+                        )),
                   ],
                 ),
                 const SizedBox(height: 10.0),
@@ -153,7 +271,7 @@ class _DetailProductState extends State<DetailProduct> {
                       ),
                       const SizedBox(height: 8.0),
                       Text(
-                         ' ${widget.product["price"]} VND',
+                        ' ${widget.product["price"]} VND',
                         style: const TextStyle(
                           fontSize: 18.0,
                           color: Colors.red,
@@ -161,11 +279,8 @@ class _DetailProductState extends State<DetailProduct> {
                       ),
                       const SizedBox(height: 8.0),
                       const Text('Màu sắc',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17.0
-                        )
-                      ),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 17.0)),
                       InkWell(
                         child: GridView.builder(
                           physics: const NeverScrollableScrollPhysics(),
@@ -179,23 +294,24 @@ class _DetailProductState extends State<DetailProduct> {
                           itemCount: colors.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
+                            final color = colors[index];
                             return InkWell(
-                              onTap: () {
-
-                              },
-                              child: Card(
-                                color: const Color(0xFFD9D9D9),
-                                child: Center(
-                                  child: 
-                                  Text(
-                                    colors[index],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold
-                                    ),
-                                  )
-                                )
-                              )
-                            );
+                                onTap: () {
+                                  setState(() {
+                                    selectedID = color['color_id'];
+                                    print('id_color: ' + selectedID.toString());
+                                  });
+                                },
+                                child: Card(
+                                    color: selectedID == color['color_id']
+                                        ? Colors.blue
+                                        : null,
+                                    child: Center(
+                                        child: Text(
+                                      color['color_name'],
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ))));
                           },
                         ),
                       ),
@@ -203,25 +319,19 @@ class _DetailProductState extends State<DetailProduct> {
                         height: 20.0,
                       ),
                       const Text('Mô tả sản phẩm',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15.0
-                        )
-                      ),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15.0)),
                       Container(
                           width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
-                            color: const Color(0XFFD9D9D9),
-                            borderRadius: BorderRadius.circular(15)
-                          ),
+                              color: const Color(0XFFD9D9D9),
+                              borderRadius: BorderRadius.circular(15)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  '${widget.product["description"]}'
-                                )
+                                Text('${widget.product["description"]}')
                               ],
                             ),
                           )),
@@ -240,7 +350,8 @@ class _DetailProductState extends State<DetailProduct> {
   }
 
   Future<List> loadProduct() async {
-    final response = await http.get(Uri.parse('http://192.168.1.3/flutter/loadColorByProductDetail.php?product_id=${widget.product["product_id"]}'));
+    final response = await http.get(Uri.parse(
+        'http://192.168.1.4/flutter/loadColorByProductDetail.php?product_id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

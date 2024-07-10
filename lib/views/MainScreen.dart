@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key? key}) : super(key: key);
-
+  
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
@@ -33,15 +33,6 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Icon(Icons.phone_in_talk, color: Colors.white),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(90),
-        ),
-      ),
       bottomNavigationBar: CurvedNavigationBar(
         height: 60.0,
         items: const [

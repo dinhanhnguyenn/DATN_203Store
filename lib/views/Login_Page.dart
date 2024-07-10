@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:app_203store/models/CartProdvider.dart';
 import 'package:app_203store/models/UserProvider.dart';
+import 'package:app_203store/views/AdminScreen.dart';
 import 'package:app_203store/views/ForgetPass_Page.dart';
 import 'package:app_203store/views/MainScreen.dart';
 import 'package:app_203store/views/Register_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-// Điều hướng đến màn hình chính sau khi đăng nhập thành công
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -38,20 +38,46 @@ class _LoginPageState extends State<LoginPage> {
 
         // Lấy thông tin user từ response
         final userId = jsonResponse['user_id'];
-        final userName = jsonResponse['username'];
-        final userEmail = jsonResponse['email'];
-        final userFullName = jsonResponse['full_name'];
-        final idCart = jsonResponse['id_cart']; // Lấy id_cart từ response
+        final userRole = jsonResponse['role']; // Lấy vai trò của user từ response
 
-        // Cập nhật thông tin user và id_cart vào Provider
-        Provider.of<CartProvider>(context, listen: false).setIdCart(idCart);
+        // Cập nhật thông tin user vào Provider
         Provider.of<UserProvider>(context, listen: false).setUserId(userId);
 
-        // Điều hướng đến màn hình chính
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
+        // Gọi API để lấy cart_id
+        final cartResponse = await http.get(
+          Uri.parse('http://192.168.1.4/flutter/loadIdcart.php?userId=$userId'),
         );
+
+        if (cartResponse.statusCode == 200) {
+          final cartJsonResponse = jsonDecode(cartResponse.body);
+          if (cartJsonResponse['status'] == 'success') {
+            final cartId = cartJsonResponse['cart_id'];
+
+            // Cập nhật cart_id vào Provider
+            Provider.of<CartProvider>(context, listen: false).setIdCart(cartId);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(cartJsonResponse['message'])),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Lỗi kết nối đến máy chủ khi lấy cart_id')),
+          );
+        }
+
+        // Điều hướng đến màn hình tương ứng với vai trò
+        if (userRole == 'admin') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AdminScreen()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreen()),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(jsonResponse['message'])),
@@ -66,9 +92,14 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    int userId = Provider.of<UserProvider>(context).userId;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         backgroundColor: Colors.lightBlue[200],
       ),
       body: SingleChildScrollView(

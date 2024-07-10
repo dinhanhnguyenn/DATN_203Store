@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:app_203store/views/DetailProduct.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -12,6 +13,8 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _products = [];
+
+   var formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ');
 
   Future<void> _searchProducts(String searchChar) async {
     final response = await http.get(Uri.parse(
@@ -74,49 +77,49 @@ class _SearchScreenState extends State<SearchScreen> {
                                 ),
                               );
                             },
-                            child: Card(
+                            child: Container(
+                            height: 240,
+                            width: 170,
+                            decoration: BoxDecoration(
                               color: const Color(0xFFD9D9D9),
-                              elevation: 7.0,
-                              child: ListTile(
-                                subtitle: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Expanded(
-                                      child: Center(
-                                        child: Image.network(
-                                          "http://192.168.1.4/flutter/uploads/${_products[index]["image"]}",
-                                          fit: BoxFit.cover,
-                                        ),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 2.0
+                              )
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 120,
+                                    child: ClipRRect(
+                                      child: Image.network(
+                                        "http://192.168.1.4/flutter/uploads/${_products[index]["image"]}",
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5),
-                                      child: Text(
-                                        "${_products[index]["name"]}",
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
+                                  ),
+                                  Text(
+                                    "${_products[index]["name"]}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 5, bottom: 5),
-                                      child: Text(
-                                        ' ${_products[index]["price"]} VND',
-                                        style: const TextStyle(
-                                          color: Colors.red,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
+                                    textAlign: TextAlign.start,
+                                  ),
+                                  Text(
+                                    '${formatCurrency.format((_products[index]["price"]))}',
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
+                          )
                           );
                         },
                       ),

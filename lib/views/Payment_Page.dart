@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:app_203store/views/InvoiceScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -23,49 +24,6 @@ class _PaymentState extends State<Payment> {
     setState(() {
       _paymentMethod = value!;
     });
-  }
-
-  Future<void> _createMoMoPayment(int orderId) async {
-    final url =
-        'http://192.168.1.4/flutter/onlinepayment.php'; // Sửa URL thành địa chỉ chính xác của bạn
-
-    final response = await http.post(
-      Uri.parse(url),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'partnerCode': 'MOMOBKUN20180529',
-        'accessKey': 'klm05TvNBzhg7h7j',
-        'secretKey': 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa',
-        'orderId': orderId.toString(),
-        'orderInfo': 'Thanh toán qua MoMo',
-        'amount': widget.total.toString(),
-        'ipnUrl': 'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b',
-        'redirectUrl':
-            'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b',
-        'extraData': '',
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      if (jsonResponse['payUrl'] != null) {
-        _launchURL(jsonResponse['payUrl']);
-      } else {
-        print('Error creating transaction: ${jsonResponse['message']}');
-      }
-    } else {
-      print('Failed to create transaction.');
-    }
-  }
-
-  void _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
   }
 
   @override
@@ -111,11 +69,13 @@ class _PaymentState extends State<Payment> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  if (_paymentMethod == 'e_wallet') {
-                    _createMoMoPayment(widget.order_id);
-                  } else {
-                    // Xử lý logic thanh toán khi nhận hàng
-                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => InvoiceScreen(
+                              order_id: widget.order_id,
+                            )),
+                  );
                 },
                 child: Text('Thanh Toán'),
                 style: ElevatedButton.styleFrom(

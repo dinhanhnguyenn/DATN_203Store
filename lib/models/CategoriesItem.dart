@@ -13,74 +13,76 @@ class CategoriesItem extends StatefulWidget {
 }
 
 class _CategoriesItemState extends State<CategoriesItem> {
-  
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: loadCategories(),
-      builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No data available'));
-        } else {
-          List<dynamic> categoryList = snapshot.data!;
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
-                childAspectRatio: 3.5,
-              ),
-              itemCount: categoryList.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CategoryScreen(category: categoryList[index]),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width / 3 - 30,
-                    decoration: BoxDecoration(
-                      color: Colors.lightBlue[200],
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                            "${categoryList[index]["category_name"]}",
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold
+        future: loadCategories(),
+        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('Không có dữ liệu'));
+          } else {
+            List<dynamic> categoryList = snapshot.data!;
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8.0,
+                  mainAxisSpacing: 8.0,
+                  childAspectRatio: 3.5,
+                ),
+                itemCount: categoryList.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              CategoryScreen(category: categoryList[index]),
                         ),
-                      )
-                      ],
+                      );
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width / 3 - 30,
+                      decoration: BoxDecoration(
+                        color: Colors.lightBlue[200],
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 2.0
+                        )
+                      ),    
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "${categoryList[index]["category_name"]}",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
-          );
-        }
-      }
-    );
+                  );
+                },
+              ),
+            );
+          }
+        });
   }
 }
 
 Future<List> loadCategories() async {
-  final response = await http.get(Uri.parse('http://192.168.1.4/flutter/loadCategories.php'));
+  final response = await http
+      .get(Uri.parse('http://192.168.1.4/flutter/loadCategories.php'));
   if (response.statusCode == 200) {
     return json.decode(response.body);
   } else {

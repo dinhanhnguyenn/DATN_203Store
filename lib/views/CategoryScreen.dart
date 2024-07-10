@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:app_203store/views/DetailProduct.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class CategoryScreen extends StatefulWidget {
   CategoryScreen({super.key, required this.category});
@@ -12,6 +13,9 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
+
+  var formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +27,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           children: [
             FutureBuilder(
               future: loadProductByCategory(),
-              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+              builder: (context,  snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
@@ -31,7 +35,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(child: Text('Không có sản phẩm'));
                 } else {
-                  List<dynamic> productList = snapshot.data!;
+                 var productList = snapshot.data!;
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GridView.builder(
@@ -46,51 +50,48 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       itemBuilder: (context, index) {
                         return InkWell(
                           onTap: () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    DetailProduct(product: productList[index]),
-                              ),
+                              MaterialPageRoute(builder: (context) => DetailProduct(product: productList[index],)),
                             );
                           },
-                          child: Card(
-                            color: const Color(0xFFD9D9D9),
-                            elevation: 7.0,
-                            child: ListTile(
-                              subtitle: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                          child: Container(
+                            height: 240,
+                            width: 170,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFD9D9D9),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 2.0
+                              )
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    child: Center(
+                                  Container(
+                                    height: 120,
+                                    child: ClipRRect(
                                       child: Image.network(
                                         "http://192.168.1.4/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 5),
-                                    child: Text(
-                                      "${productList[index]["name"]}",
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                      ),
-                                      textAlign: TextAlign.center,
+                                  Text(
+                                    "${productList[index]["name"]}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
+                                    textAlign: TextAlign.start,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 5, bottom: 5),
-                                    child: Text(
-                                      ' ${productList[index]["price"]} VND',
-                                      style: const TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      textAlign: TextAlign.center,
+                                  Text(
+                                    '${formatCurrency.format((productList[index]["price"]))}',
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold
                                     ),
                                   ),
                                 ],

@@ -10,8 +10,10 @@ import 'package:app_203store/views/HomeScreen.dart';
 import 'package:app_203store/views/Login_Page.dart';
 import 'package:app_203store/views/MainScreen.dart';
 import 'package:app_203store/views/NotificationsScreen.dart';
+import 'package:app_203store/views/OrderManager.dart';
 import 'package:app_203store/views/Payment_Page.dart';
 import 'package:app_203store/views/Register_Page.dart';
+import 'package:app_203store/views/ReviewManager.dart';
 import 'package:app_203store/views/UpdateProductsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/admin',
+      initialRoute: '/',
       routes: {
         '/login': (context) => LoginPage(),
         '/register': (context) => Register(),
@@ -45,7 +47,9 @@ class MyApp extends StatelessWidget {
         '/notifi': (context) => const NotificationsScreen(),
         '/addproduct': (context) => const AddProductsScreen(),
         '/cart': (context) => const Cart(),
-        '/admin':(context) => const AdminScreen()
+        '/order': (context) => ManageOrdersPage(),
+        '/review': (AboutDialog) => ReviewManager(),
+        '/admin':(context) => AdminScreen()
       },
     );
   }

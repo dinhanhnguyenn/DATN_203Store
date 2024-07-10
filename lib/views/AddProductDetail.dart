@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app_203store/models/ProductDetail.dart';
+import 'package:app_203store/views/ProductsManagerScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -222,21 +223,28 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
           ),
         ));
   }
-}
 
-Future productDetailAdd(ProductDetail pro) async {
-  final uri = Uri.parse('http://192.168.1.4/flutter/addProductDetail.php');
-  var request = http.MultipartRequest('POST', uri);
-  request.fields['product_id'] = pro.product_id;
-  request.fields['color_id'] = pro.color_id;
-  request.fields['quantity'] = pro.quantity;
-  request.fields['status'] = 1.toString();
+  Future productDetailAdd(ProductDetail pro) async {
+    final uri = Uri.parse('http://192.168.1.4/flutter/addProductDetail.php');
+    var request = http.MultipartRequest('POST', uri);
+    request.fields['product_id'] = pro.product_id;
+    request.fields['color_id'] = pro.color_id;
+    request.fields['quantity'] = pro.quantity;
+    request.fields['status'] = 1.toString();
 
-  var response = await request.send();
+    var response = await request.send();
 
-  if (response.statusCode == 200) {
-    print("Nhập hàng thành công");
-  } else {
-    print("Nhập hàng thất bại");
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Thêm sản phẩm thành công')),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi thêm sản phẩm')),
+      );
+    }
   }
 }
+
+

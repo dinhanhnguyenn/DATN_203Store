@@ -9,6 +9,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -21,6 +22,8 @@ class HomeScreen extends StatelessWidget {
     "assets/6.jpg",
     "assets/7.jpg",
   ];
+
+  var formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ');
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +127,20 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("Tất cả sản phẩm",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             FutureBuilder(
               future: loadProduct(),
               builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
@@ -132,7 +149,7 @@ class HomeScreen extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No data available'));
+                  return Center(child: Text('Không có sản phẩm'));
                 } else {
                   List<dynamic> productList = snapshot.data!;
                   return Padding(
@@ -158,49 +175,72 @@ class HomeScreen extends StatelessWidget {
                               ),
                             );
                           },
-                          child: Card(
-                            color: const Color(0xFFD9D9D9),
-                            elevation: 7.0,
-                            child: ListTile(
-                              subtitle: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                          child: Container(
+                            height: 240,
+                            width: 170,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFD9D9D9),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 2.0
+                              )
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    child: Center(
+                                  Container(
+                                    height: 100,
+                                    child: ClipRRect(
                                       child: Image.network(
                                         "http://192.168.1.4/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 5),
-                                    child: Text(
-                                      "${productList[index]["name"]}",
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                      ),
-                                      textAlign: TextAlign.center,
+                                  Text(
+                                    "${productList[index]["name"]}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                    textAlign: TextAlign.start,
+                                  ),
+                                  Text(
+                                    '${formatCurrency.format(double.parse(productList[index]["price"]))}',
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 5, bottom: 5),
-                                    child: Text(
-                                      ' ${productList[index]["price"]} VND',
-                                      style: const TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: InkWell(
+                                      onTap: (){},
+                                      child: Container(
+                                        height: 30,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: Colors.lightBlue[200],
+                                          border: Border.all(
+                                            color: Colors.black,
+                                            width: 2.0
+                                          )
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            "Thêm vào giỏ hàng"
+                                          ),
+                                        ),
                                       ),
-                                      textAlign: TextAlign.center,
                                     ),
-                                  ),
+                                  )
                                 ],
                               ),
                             ),
-                          ),
+                          )
                         );
                       },
                     ),

@@ -29,12 +29,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AccountScreen(),
-              ),
-            );
+            Navigator.pop(context);
           },
         ),
       ),
@@ -111,8 +106,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     );
                     return;
                   }
-
-                  // Gọi hàm để gửi yêu cầu cập nhật thông tin người dùng
                   updateUserInfo(username, fullName, phone, address);
                 },
                 style: ElevatedButton.styleFrom(
@@ -155,9 +148,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
         SnackBar(content: Text('Cập nhật thông tin thành công')),
       );
       Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
-        );
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
+      );
     } else {
       // Xử lý khi có lỗi từ phía server
       ScaffoldMessenger.of(context).showSnackBar(

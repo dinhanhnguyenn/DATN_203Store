@@ -19,6 +19,12 @@ class _CategoriesManagerScreenState extends State<CategoriesManagerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           backgroundColor: Colors.lightBlue[200],
           title: const Text("Quản lý danh mục"),
         ),
@@ -143,8 +149,8 @@ class _CategoriesManagerScreenState extends State<CategoriesManagerScreen> {
 }
 
 Future<List> loadCategoriesByAdmin() async {
-  final response = await http.get(
-      Uri.parse('http://192.168.1.4/flutter/loadCategoriesByAdmin.php'));
+  final response = await http
+      .get(Uri.parse('http://192.168.1.4/flutter/loadCategoriesByAdmin.php'));
   if (response.statusCode == 200) {
     return json.decode(response.body);
   } else {
@@ -153,7 +159,7 @@ Future<List> loadCategoriesByAdmin() async {
 }
 
 Future categoryDelete(Category pro) async {
-  final uri = Uri.parse('http://192.168.30.103/flutter/deleteCategories.php');
+  final uri = Uri.parse('http://192.168.1.4/flutter/deleteCategories.php');
   var request = http.MultipartRequest('POST', uri);
 
   request.fields['category_id'] = pro.category_id;

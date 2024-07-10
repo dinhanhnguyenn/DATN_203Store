@@ -31,6 +31,12 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           backgroundColor: Colors.lightBlue[200],
           title: const Text("Quản lý sản phẩm"),
         ),

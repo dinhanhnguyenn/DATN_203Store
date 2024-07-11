@@ -179,7 +179,7 @@ class HomeScreen extends StatelessWidget {
                             height: 240,
                             width: 170,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFD9D9D9),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: Colors.black,
@@ -191,10 +191,10 @@ class HomeScreen extends StatelessWidget {
                               child: Column(
                                 children: [
                                   Container(
-                                    height: 100,
+                                    height: 120,
                                     child: ClipRRect(
                                       child: Image.network(
-                                        "http://192.168.1.4/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.5/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -214,29 +214,6 @@ class HomeScreen extends StatelessWidget {
                                       fontWeight: FontWeight.bold
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                                    child: InkWell(
-                                      onTap: (){},
-                                      child: Container(
-                                        height: 30,
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          color: Colors.lightBlue[200],
-                                          border: Border.all(
-                                            color: Colors.black,
-                                            width: 2.0
-                                          )
-                                        ),
-                                        child: const Center(
-                                          child: Text(
-                                            "Thêm vào giỏ hàng"
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
                                 ],
                               ),
                             ),
@@ -247,7 +224,8 @@ class HomeScreen extends StatelessWidget {
                   );
                 }
               },
-            )
+            ),
+            
           ],
         ),
       ),
@@ -256,7 +234,7 @@ class HomeScreen extends StatelessWidget {
 
   Future<List> loadProduct() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.1.5/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

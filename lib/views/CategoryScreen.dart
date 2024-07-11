@@ -33,7 +33,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('Không có sản phẩm'));
+                  return const Center(child: Text('Cửa hàng chưa có sản phẩm', style: TextStyle(fontWeight: FontWeight.bold),));
                 } else {
                  var productList = snapshot.data!;
                   return Padding(
@@ -59,7 +59,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             height: 240,
                             width: 170,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFD9D9D9),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: Colors.black,
@@ -74,7 +74,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                     height: 120,
                                     child: ClipRRect(
                                       child: Image.network(
-                                        "http://192.168.1.4/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.5/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -113,7 +113,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   Future<List> loadProductByCategory() async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.4/flutter/loadProductByCategory.php?category_id=${widget.category["category_id"]}'));
+        'http://192.168.1.5/flutter/loadProductByCategory.php?category_id=${widget.category["category_id"]}'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

@@ -25,7 +25,7 @@ class _DetailProductState extends State<DetailProduct> {
 
   Future<void> loadColors() async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.4/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
+        'http://192.168.1.5/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       setState(() {
@@ -66,7 +66,7 @@ class _DetailProductState extends State<DetailProduct> {
       );
       return;
     }
-    final url = Uri.parse('http://192.168.1.4/flutter/add_to_cart.php');
+    final url = Uri.parse('http://192.168.1.5/flutter/add_to_cart.php');
     try {
       final response = await http.post(url, body: {
         'product_id': widget.product['product_id'].toString(),
@@ -122,7 +122,7 @@ class _DetailProductState extends State<DetailProduct> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/flutter/addOrder.php'),
+        Uri.parse('http://192.168.1.5/flutter/addOrder.php'),
         body: {
           'user_id': userId.toString(),
           'total': totalPrice.toString(),
@@ -134,7 +134,7 @@ class _DetailProductState extends State<DetailProduct> {
         if (data['status'] == 'success') {
           int orderId = data['order_id'];
           await http.post(
-            Uri.parse('http://192.168.1.4/flutter/addDetailOrder.php'),
+            Uri.parse('http://192.168.1.5/flutter/addDetailOrder.php'),
             body: {
               'order_id': orderId.toString(),
               'product_id': widget.product['product_id'].toString(),
@@ -171,14 +171,14 @@ class _DetailProductState extends State<DetailProduct> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Icon(Icons.phone_in_talk, color: Colors.white),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(90),
+      appBar: AppBar(
+        title: Text(
+          "Chi tiết sản phẩm",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        backgroundColor: Colors.lightBlue[200],
       ),
       bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -205,7 +205,7 @@ class _DetailProductState extends State<DetailProduct> {
           ),
           Expanded(
             child: MaterialButton(
-              color: Colors.red,
+              color: Colors.lightBlue[200],
               onPressed: () {
                 _createOrder();
               },
@@ -243,23 +243,10 @@ class _DetailProductState extends State<DetailProduct> {
                 Stack(
                   children: [
                     Image.network(
-                      "http://192.168.1.4/flutter/uploads/${widget.product["image"]}",
-                      height: 300,
+                      "http://192.168.1.5/flutter/uploads/${widget.product["image"]}",
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
-                    Positioned(
-                        top: 8.0,
-                        child: IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.black,
-                            size: 24.0,
-                          ),
-                        )),
                   ],
                 ),
                 const SizedBox(height: 10.0),
@@ -425,7 +412,7 @@ class _DetailProductState extends State<DetailProduct> {
   Future<void> fetchReviewsByProductId(int productId) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/flutter/loadReviewbyProduct.php'),
+        Uri.parse('http://192.168.1.5/flutter/loadReviewbyProduct.php'),
         body: {
           'product_id': productId.toString(),
           'status': '1', // Chỉ lấy những đánh giá có status = 1

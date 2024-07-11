@@ -33,7 +33,7 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
 
   Future<void> loadProducts() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.1.5/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       setState(() {
         productList = json.decode(response.body);
@@ -45,7 +45,7 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
 
   Future<void> loadColors() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadColor.php'));
+        .get(Uri.parse('http://192.168.1.5/flutter/loadColor.php'));
     if (response.statusCode == 200) {
       setState(() {
         colorList = json.decode(response.body);
@@ -225,7 +225,7 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
   }
 
   Future productDetailAdd(ProductDetail pro) async {
-    final uri = Uri.parse('http://192.168.1.4/flutter/addProductDetail.php');
+    final uri = Uri.parse('http://192.168.1.5/flutter/addProductDetail.php');
     var request = http.MultipartRequest('POST', uri);
     request.fields['product_id'] = pro.product_id;
     request.fields['color_id'] = pro.color_id;

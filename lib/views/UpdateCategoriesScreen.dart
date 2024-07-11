@@ -103,7 +103,7 @@ class _UpdateCategoriesScreenState extends State<UpdateCategoriesScreen> {
 }
 
 Future categoriesUpdate(Category loai) async {
-  final uri = Uri.parse('http://192.168.1.4/flutter/updateCategories.php');
+  final uri = Uri.parse('http://192.168.1.5/flutter/updateCategories.php');
   print(loai.category_name);
   http.post(uri, body: {
     'category_id': loai.category_id,

@@ -198,7 +198,7 @@ class _AdminScreenState extends State<AdminScreen> {
                                   Expanded(
                                     child: Center(
                                       child: Image.network(
-                                        "http://192.168.1.4/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.3/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -246,7 +246,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
   Future<List> loadProduct() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.1.3/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

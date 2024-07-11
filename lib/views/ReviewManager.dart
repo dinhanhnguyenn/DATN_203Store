@@ -21,7 +21,7 @@ class _ReviewManagerState extends State<ReviewManager> {
   Future<void> fetchReviews() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.4/flutter/loadreview.php'),
+        Uri.parse('http://192.168.1.5/flutter/loadreview.php'),
       );
 
       print('Response status: ${response.statusCode}');
@@ -52,7 +52,7 @@ class _ReviewManagerState extends State<ReviewManager> {
   Future<void> updateReviewStatus(int reviewId, int status) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/flutter/updateReviewStatus.php'),
+        Uri.parse('http://192.168.1.5/flutter/updateReviewStatus.php'),
         body: {
           'review_id': reviewId.toString(),
           'status': status.toString(),

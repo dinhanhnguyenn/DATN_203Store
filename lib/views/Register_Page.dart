@@ -44,12 +44,13 @@ class _RegisterState extends State<Register> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/flutter/register.php'),
+        Uri.parse('http://192.168.1.5/flutter/register.php'),
         body: {
           'email': email,
           'password': password,
           'phone': phone,
           'address': address,
+          'status': 1.toString()
         },
       );
 

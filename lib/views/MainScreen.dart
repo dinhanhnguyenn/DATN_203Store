@@ -24,7 +24,6 @@ class _MainScreenState extends State<MainScreen> {
 
     _pages = [
       HomeScreen(),
-      const NotificationsScreen(),
       AccountScreen(),
     ];
   }
@@ -37,7 +36,6 @@ class _MainScreenState extends State<MainScreen> {
         height: 60.0,
         items: const [
           Icon(Icons.home, size: 30),
-          Icon(Icons.notifications_active, size: 30),
           Icon(Icons.account_circle_outlined, size: 30),
         ],
         color: Colors.lightBlue[200]!,
@@ -49,11 +47,9 @@ class _MainScreenState extends State<MainScreen> {
             _currentIndex = index;
           });
           if (index == 1 || index == 2) {
-            // Lấy userId từ Provider
             int userId =
                 Provider.of<UserProvider>(context, listen: false).userId;
             if (userId == 0) {
-              // Điều hướng người dùng đến màn hình đăng nhập
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => LoginPage()),

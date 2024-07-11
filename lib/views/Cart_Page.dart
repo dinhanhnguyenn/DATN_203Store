@@ -27,7 +27,7 @@ class _CartState extends State<Cart> {
   Future<void> _fetchCartItems() async {
     final idCart = Provider.of<CartProvider>(context, listen: false).idCart;
     final response = await http.post(
-      Uri.parse('http://192.168.1.4/flutter/loadDetail_Cart.php'),
+      Uri.parse('http://192.168.1.5/flutter/loadDetail_Cart.php'),
       body: {'id_cart': idCart.toString()},
     );
 
@@ -69,7 +69,7 @@ class _CartState extends State<Cart> {
 
   Future<void> _deleteItemCart(String cartDetailId) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.4/flutter/update_status.php'),
+      Uri.parse('http://192.168.1.5/flutter/update_status.php'),
       body: {'cartz_detail_id': cartDetailId},
     );
 
@@ -97,7 +97,7 @@ class _CartState extends State<Cart> {
 
   Future<void> _updateQuantity(String cartDetailId, int newQuantity) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.4/flutter/update_quantity.php'),
+      Uri.parse('http://192.168.1.5/flutter/update_quantity.php'),
       body: {
         'cartz_detail_id': cartDetailId,
         'new_quantity': newQuantity.toString(),
@@ -134,7 +134,7 @@ class _CartState extends State<Cart> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/flutter/addOrder.php'),
+        Uri.parse('http://192.168.1.5/flutter/addOrder.php'),
         body: {
           'user_id': userId.toString(),
           'total': totalPrice.toString(),
@@ -149,7 +149,7 @@ class _CartState extends State<Cart> {
           // Gọi API để thêm chi tiết đơn hàng
           for (var item in _cartItems) {
             await http.post(
-              Uri.parse('http://192.168.1.4/flutter/addDetailOrder.php'),
+              Uri.parse('http://192.168.1.5/flutter/addDetailOrder.php'),
               body: {
                 'order_id': orderId.toString(),
                 'product_id': item['product_id'].toString(),
@@ -214,7 +214,7 @@ class _CartState extends State<Cart> {
                     child: Row(
                       children: [
                         Image.network(
-                          'http://192.168.1.4/flutter/uploads/${item['image']}',
+                          'http://192.168.1.5/flutter/uploads/${item['image']}',
                           width: 50,
                           height: 50,
                           fit: BoxFit.cover,

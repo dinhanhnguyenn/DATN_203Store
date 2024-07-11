@@ -18,7 +18,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> _searchProducts(String searchChar) async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.4/flutter/searchProduct.php?search=$searchChar'));
+        'http://192.168.1.5/flutter/searchProduct.php?search=$searchChar'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -81,7 +81,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             height: 240,
                             width: 170,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFD9D9D9),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: Colors.black,
@@ -93,10 +93,10 @@ class _SearchScreenState extends State<SearchScreen> {
                               child: Column(
                                 children: [
                                   Container(
-                                    height: 120,
+                                    height: 110,
                                     child: ClipRRect(
                                       child: Image.network(
-                                        "http://192.168.1.4/flutter/uploads/${_products[index]["image"]}",
+                                        "http://192.168.1.5/flutter/uploads/${_products[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -133,7 +133,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<List> loadProduct() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.1.5/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

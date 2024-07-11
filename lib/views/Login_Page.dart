@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login(BuildContext context) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.4/flutter/login.php'),
+      Uri.parse('http://192.168.1.5/flutter/login.php'),
       body: {
         'email': _emailController.text,
         'password': _passwordController.text,
@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
 
         // Gọi API để lấy cart_id
         final cartResponse = await http.get(
-          Uri.parse('http://192.168.1.4/flutter/loadIdcart.php?userId=$userId'),
+          Uri.parse('http://192.168.1.5/flutter/loadIdcart.php?userId=$userId'),
         );
 
         if (cartResponse.statusCode == 200) {
@@ -94,12 +94,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         backgroundColor: Colors.lightBlue[200],
       ),
       body: SingleChildScrollView(
@@ -207,22 +201,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(
                 height: 30,
-              ),
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Forget()),
-                      );
-                    },
-                    child: Text(
-                      "Bạn đã quên mật khẩu?",
-                      style: TextStyle(color: Colors.lightBlue[200]),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),

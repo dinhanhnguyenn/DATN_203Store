@@ -14,7 +14,7 @@ class _ForgetState extends State<Forget> {
 
   Future<void> _sendResetPasswordRequest() async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.4/forget_password.php'),
+      Uri.parse('http://192.168.1.5/forget_password.php'),
       body: {
         'email': _emailController.text,
       },

@@ -7,11 +7,9 @@ import 'package:provider/provider.dart';
 import 'package:app_203store/models/UserProvider.dart';
 
 class Payment extends StatefulWidget {
-  final int order_id;
   final double total;
 
-  const Payment({Key? key, required this.order_id, required this.total})
-      : super(key: key);
+  const Payment({Key? key, required this.total}) : super(key: key);
 
   @override
   _PaymentState createState() => _PaymentState();
@@ -24,6 +22,27 @@ class _PaymentState extends State<Payment> {
     setState(() {
       _paymentMethod = value!;
     });
+  }
+
+  void _handlePayment() {
+    if (_paymentMethod == 'cash_on_delivery') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => InvoiceScreen(
+            total: widget.total,
+          ),
+        ),
+      );
+    } else {
+      // Logic for e_wallet payment
+      _processEwalletPayment();
+    }
+  }
+
+  Future<void> _processEwalletPayment() async {
+    // Logic for processing e-wallet payment
+    // Replace this comment with the actual logic to handle e-wallet payments
   }
 
   @override
@@ -68,15 +87,7 @@ class _PaymentState extends State<Payment> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => InvoiceScreen(
-                              order_id: widget.order_id,
-                            )),
-                  );
-                },
+                onPressed: _handlePayment,
                 child: Text('Thanh Toán'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,

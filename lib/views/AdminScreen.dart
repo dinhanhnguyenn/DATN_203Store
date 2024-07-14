@@ -6,12 +6,15 @@ import 'package:app_203store/views/AddProductDetail.dart';
 import 'package:app_203store/views/AddProductScreen.dart';
 import 'package:app_203store/views/CategoriesManagerScreen.dart';
 import 'package:app_203store/views/DetailProduct.dart';
+import 'package:app_203store/views/InfoProduct.dart';
 import 'package:app_203store/views/OrderManager.dart';
 import 'package:app_203store/views/ProductsManagerScreen.dart';
 import 'package:app_203store/views/ReviewManager.dart';
+import 'package:app_203store/views/Statistics_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -21,6 +24,9 @@ class AdminScreen extends StatefulWidget {
 }
 
 class _AdminScreenState extends State<AdminScreen> {
+
+  var formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ');
+
   @override
   void initState() {
     super.initState();
@@ -76,27 +82,6 @@ class _AdminScreenState extends State<AdminScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.reviews),
-              title: Text('Thêm Sản Phẩm'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AddProductsScreen()),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.reviews),
-              title: Text('Thêm Chi Tiết Sản Phẩm'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AddProductDetailScreen()),
-                );
-              },
-            ),
-            ListTile(
               leading: Icon(Icons.category),
               title: Text('Quản Lí Danh Mục'),
               onTap: () {
@@ -108,7 +93,7 @@ class _AdminScreenState extends State<AdminScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.person),
+leading: Icon(Icons.person),
               title: Text('Quản Lí Tài Khoản'),
               onTap: () {
                 Navigator.push(
@@ -129,16 +114,44 @@ class _AdminScreenState extends State<AdminScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.history),
+              leading: Icon(Icons.stacked_line_chart),
               title: Text('Thông Kê'),
-              onTap: () {},
+              onTap: () {
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StatisticsPage()),
+                );
+              },
             ),
             Divider(),
             ListTile(
               leading: Icon(Icons.exit_to_app),
-              title: Text('Logout'),
+              title: Text('Đăng xuất'),
               onTap: () {
-                _logout();
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Đăng xuất'),
+                      content: Text(
+                          'Bạn có muốn đăng xuất không?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('Hủy'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: Text('Đồng ý'),
+                          onPressed: () {
+                            _logout();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
           ],
@@ -168,7 +181,7 @@ class _AdminScreenState extends State<AdminScreen> {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
+physics: const NeverScrollableScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -184,53 +197,56 @@ class _AdminScreenState extends State<AdminScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    DetailProduct(product: productList[index]),
+                                  InfoProduct(product: productList[index]),
                               ),
                             );
                           },
-                          child: Card(
-                            color: const Color(0xFFD9D9D9),
-                            elevation: 7.0,
-                            child: ListTile(
-                              subtitle: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                          child: Container(
+                            width: 170,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 2.0
+                              )
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    child: Center(
+                                  Container(
+                                    height: 110,
+                                    child: ClipRRect(
                                       child: Image.network(
-                                        "http://192.168.1.4/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 5),
+                                  Expanded(
                                     child: Text(
                                       "${productList[index]["name"]}",
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 15,
                                       ),
                                       textAlign: TextAlign.center,
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 5, bottom: 5),
-                                    child: Text(
-                                      ' ${productList[index]["price"]} VND',
-                                      style: const TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      textAlign: TextAlign.center,
+                                  Text(
+                                    '${formatCurrency.format(double.parse(productList[index]["price"]))}',
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
+                          )
                         );
                       },
                     ),
@@ -246,7 +262,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
   Future<List> loadProduct() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.1.6/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

@@ -105,19 +105,19 @@ class _AddCategoriesScreenState extends State<AddCategoriesScreen> {
     );
   }
   Future categoriesAdd(Category loai) async {
-    final uri = Uri.parse('http://192.168.1.4/flutter/addCategories.php');
+    final uri = Uri.parse('http://192.168.1.6/flutter/addCategories.php');
     print(loai.category_name);
     final response = await http.post(uri,
       body: {'category_name': loai.category_name, 'status': loai.status}
     );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Thêm sản phẩm thành công')),
+          SnackBar(content: Text('Thêm danh mục thành công')),
         );
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi khi thêm sản phẩm')),
+          SnackBar(content: Text('Lỗi khi thêm danh mục')),
         );
       }
   }

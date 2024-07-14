@@ -56,10 +56,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             );
                           },
                           child: Container(
-                            height: 240,
                             width: 170,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFD9D9D9),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: Colors.black,
@@ -71,21 +70,25 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               child: Column(
                                 children: [
                                   Container(
-                                    height: 120,
+                                    height: 110,
                                     child: ClipRRect(
                                       child: Image.network(
-                                        "http://192.168.1.4/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
-                                  Text(
-                                    "${productList[index]["name"]}",
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                  Expanded(
+                                    child: Text(
+                                      "${productList[index]["name"]}",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    textAlign: TextAlign.start,
                                   ),
                                   Text(
                                     '${formatCurrency.format((productList[index]["price"]))}',
@@ -113,7 +116,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   Future<List> loadProductByCategory() async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.4/flutter/loadProductByCategory.php?category_id=${widget.category["category_id"]}'));
+        'http://192.168.1.6/flutter/loadProductByCategory.php?category_id=${widget.category["category_id"]}'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

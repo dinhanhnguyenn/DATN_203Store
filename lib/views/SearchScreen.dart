@@ -18,7 +18,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> _searchProducts(String searchChar) async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.4/flutter/searchProduct.php?search=$searchChar'));
+        'http://192.168.1.6/flutter/searchProduct.php?search=$searchChar'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -78,48 +78,53 @@ class _SearchScreenState extends State<SearchScreen> {
                               );
                             },
                             child: Container(
-                            height: 240,
-                            width: 170,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFD9D9D9),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 2.0
-                              )
+                          //height: 270,
+                          width: 170,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2.0,
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    height: 120,
-                                    child: ClipRRect(
-                                      child: Image.network(
-                                        "http://192.168.1.4/flutter/uploads/${_products[index]["image"]}",
-                                        fit: BoxFit.cover,
-                                      ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 100,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      "http://192.168.1.6/flutter/uploads/${_products[index]["image"]}",
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                  Text(
+                                ),
+                                Expanded(
+                                  child: Text(
                                     "${_products[index]["name"]}",
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16,
                                     ),
-                                    textAlign: TextAlign.start,
+                                    textAlign: TextAlign.center,
+                                    softWrap: true,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  Text(
-                                    '${formatCurrency.format((_products[index]["price"]))}',
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold
-                                    ),
+                                ),
+                                Text(
+                                  '${formatCurrency.format((_products[index]["price"]))}',
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          )
+                          ),
+                        ),
                           );
                         },
                       ),
@@ -133,7 +138,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<List> loadProduct() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.1.6/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

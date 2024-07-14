@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:app_203store/views/MainScreen.dart';
-import 'package:app_203store/views/ReviewOrder.dart';
 import 'package:app_203store/views/detail_order_User.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -33,17 +32,24 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
       errorMessage = '';
     });
 
-    final response = await http.get(Uri.parse(
-        'http://192.168.1.4/flutter/loadorderUser.php?user_id=${widget.user_id}'));
+    try {
+      final response = await http.get(Uri.parse(
+          'http://192.168.1.6/flutter/loadorderUser.php?user_id=${widget.user_id}'));
 
-    if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
+        setState(() {
+          orders = json.decode(response.body);
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Failed to load orders';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
       setState(() {
-        orders = json.decode(response.body);
-        isLoading = false;
-      });
-    } else {
-      setState(() {
-        errorMessage = 'Failed to load orders';
+        errorMessage = 'Failed to connect to server: $e';
         isLoading = false;
       });
     }
@@ -52,10 +58,11 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
   Future<void> cancelOrder(int orderId) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.30.35/flutter/updateOrderStatus.php'),
+        Uri.parse('http://192.168.1.6/flutter/updateOrderStatus.php'),
         body: {
           'order_id': orderId.toString(),
-          'status': 'cancelled',
+          'status': 'Đã Hủy',
+          'status2': 'Chưa Thanh Toán'
         },
       );
 
@@ -89,8 +96,7 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
       itemCount: filteredOrders.length,
       itemBuilder: (context, index) {
         final order = filteredOrders[index];
-        bool isPending = order['status'] == 'pending';
-        bool isDelivered = order['status'] == 'delivered';
+        bool isPending = order['status'] == 'Đang chờ';
 
         return InkWell(
           onTap: () {
@@ -98,6 +104,7 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
               context,
               MaterialPageRoute(
                 builder: (context) => DetailOrderUser(
+                  status: order['status'],
                   order_id: int.parse(order['order_id']),
                 ),
               ),
@@ -151,22 +158,6 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
                       child: Text('Hủy Đơn Hàng'),
                     ),
                   ],
-                  if (isDelivered) ...[
-                    SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ReviewOrder(
-                                    order_id: int.parse(order['order_id']),
-                                    user_id: widget.user_id,
-                                  )),
-                        );
-                      },
-                      child: Text('Đánh Giá'),
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -180,24 +171,23 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.lightBlue[200],
         leading: IconButton(
-          onPressed: () {
-            Navigator.pushReplacement(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MainScreen(),
-                ));
-          },
-          icon: Icon(Icons.arrow_back),
-        ),
-        title: Text("Lịch Sử Mua Hàng"),
+                MaterialPageRoute(builder: (context) => MainScreen()),
+              );
+            }),
+        title: Text("Lịch sử mua hàng"),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: 'Đang Chờ'),
-            Tab(text: 'Đang Vận Chuyển'),
-            Tab(text: 'Đã Giao'),
-            Tab(text: 'Đã Hủy'),
+            Tab(icon: Icon(Icons.pending_actions), text: 'Đang Chờ'),
+            Tab(icon: Icon(Icons.local_shipping), text: 'Vận Tải'),
+            Tab(icon: Icon(Icons.done_all), text: 'Đã Giao'),
+            Tab(icon: Icon(Icons.cancel), text: 'Đã Hủy'),
           ],
         ),
       ),
@@ -208,10 +198,10 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
               : TabBarView(
                   controller: _tabController,
                   children: [
-                    buildOrderList(getOrdersByStatus('pending')),
-                    buildOrderList(getOrdersByStatus('shipped')),
-                    buildOrderList(getOrdersByStatus('delivered')),
-                    buildOrderList(getOrdersByStatus('cancelled')),
+                    buildOrderList(getOrdersByStatus('Đang chờ')),
+                    buildOrderList(getOrdersByStatus('Vận Chuyển')),
+                    buildOrderList(getOrdersByStatus('Đã Giao')),
+                    buildOrderList(getOrdersByStatus('Đã Hủy')),
                   ],
                 ),
     );

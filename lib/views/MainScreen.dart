@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key? key}) : super(key: key);
-  
+
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
@@ -24,7 +24,6 @@ class _MainScreenState extends State<MainScreen> {
 
     _pages = [
       HomeScreen(),
-      const NotificationsScreen(),
       AccountScreen(),
     ];
   }
@@ -37,7 +36,6 @@ class _MainScreenState extends State<MainScreen> {
         height: 60.0,
         items: const [
           Icon(Icons.home, size: 30),
-          Icon(Icons.notifications_active, size: 30),
           Icon(Icons.account_circle_outlined, size: 30),
         ],
         color: Colors.lightBlue[200]!,

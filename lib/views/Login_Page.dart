@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:app_203store/models/CartProdvider.dart';
 import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/AdminScreen.dart';
 import 'package:app_203store/views/ForgetPass_Page.dart';
@@ -22,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login(BuildContext context) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.4/flutter/login.php'),
+      Uri.parse('http://192.168.1.6/flutter/login.php'),
       body: {
         'email': _emailController.text,
         'password': _passwordController.text,
@@ -38,34 +37,12 @@ class _LoginPageState extends State<LoginPage> {
 
         // Lấy thông tin user từ response
         final userId = jsonResponse['user_id'];
-        final userRole = jsonResponse['role']; // Lấy vai trò của user từ response
+        final userRole =
+            jsonResponse['role']; // Lấy vai trò của user từ response
 
         // Cập nhật thông tin user vào Provider
         Provider.of<UserProvider>(context, listen: false).setUserId(userId);
-
-        // Gọi API để lấy cart_id
-        final cartResponse = await http.get(
-          Uri.parse('http://192.168.1.4/flutter/loadIdcart.php?userId=$userId'),
-        );
-
-        if (cartResponse.statusCode == 200) {
-          final cartJsonResponse = jsonDecode(cartResponse.body);
-          if (cartJsonResponse['status'] == 'success') {
-            final cartId = cartJsonResponse['cart_id'];
-
-            // Cập nhật cart_id vào Provider
-            Provider.of<CartProvider>(context, listen: false).setIdCart(cartId);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(cartJsonResponse['message'])),
-            );
-          }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Lỗi kết nối đến máy chủ khi lấy cart_id')),
-          );
-        }
-
+       
         // Điều hướng đến màn hình tương ứng với vai trò
         if (userRole == 'admin') {
           Navigator.pushReplacement(
@@ -94,12 +71,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         backgroundColor: Colors.lightBlue[200],
       ),
       body: SingleChildScrollView(

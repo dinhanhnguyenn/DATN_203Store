@@ -12,128 +12,138 @@ class AccountManagerScreen extends StatefulWidget {
 }
 
 class _AccountManagerScreenState extends State<AccountManagerScreen> {
+  List<dynamic> users = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUsers();
+  }
+
+  Future<void> fetchUsers() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://192.168.1.6/flutter/loadUser.php'),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        setState(() {
+          users = (json.decode(response.body) as List).map((data) {
+            return {
+              ...data,
+              'user_id': int.parse(data['user_id'].toString()),
+              'status': int.parse(data['status']
+                  .toString()), // Chuyển đổi status thành số nguyên
+            };
+          }).toList();
+        });
+      } else {
+        throw Exception('Failed to load reviews');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> updateReviewStatus(int userId, int status) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.1.6/flutter/updateAccountStatus.php'),
+        body: {
+          'user_id': userId.toString(),
+          'status': status.toString(),
+        },
+      );
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Cập nhật trạng thái thành công!')),
+        );
+        fetchUsers();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Cập nhật trạng thái thất bại.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+                Text('Đã xảy ra lỗi trong quá trình cập nhật trạng thái.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          backgroundColor: Colors.lightBlue[200],
-          title: const Text("Quản lý tài khoản"),
+      appBar: AppBar(
+        backgroundColor: Colors.lightBlue[200],
+        title: Text('Quản lý tài khoản'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        body: SingleChildScrollView(
-          child: FutureBuilder(
-            future: loadAccountByAdmin(),
-            builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Lỗi: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('Không có dữ liệu'));
-              } else {
-                List<dynamic> accountListByAdmin = snapshot.data!;
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GridView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1,
-                      crossAxisSpacing: 8.0,
-                      mainAxisSpacing: 8.0,
-                      childAspectRatio: 4,
+      ),
+      body: users.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (context, index) {
+                final user = users[index];
+                return Card(
+                  margin: EdgeInsets.all(8.0),
+                  child: ListTile(
+                    title: Text('Tài khoản: ${user['username']}'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Email: ${user['email']}'),
+                        Text('Địa chỉ: ${user['address']}'),
+                        Text('Điện thoại: ${user['phone']}'),
+                      ],
                     ),
-                    itemCount: accountListByAdmin.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFD9D9D9),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Username: ${accountListByAdmin[index]["username"]}",
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 17),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            User del = User(
-                                                user_id:
-                                                    accountListByAdmin[index]
-                                                        ["user_id"],
-                                                full_name: "",
-                                                password: "",
-                                                username: "",
-                                                status: "");
-                                            userDelete(del);
-                                          },
-                                          icon: const Icon(Icons.lock_rounded),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                    trailing: Switch(
+                      value: user['status'] == 1,
+                      onChanged: (value) {
+                        int newStatus = value ? 1 : 0;
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Đổi trạng thái tài khoản'),
+                              content: Text(newStatus == 1
+                                  ? 'Bạn có chắc chắn muốn khôi phục tài khoản này không?'
+                                  : 'Bạn có chắc chắn muốn khóa tài khoản này không?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text('Hủy'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                                TextButton(
+                                  child: Text('Đồng ý'),
+                                  onPressed: () {
+                                    updateReviewStatus(
+                                        user['user_id'], newStatus);
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 );
-              }
-            },
-          ),
-        ));
-  }
-
-  Future<List> loadAccountByAdmin() async {
-    final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadAccount.php'));
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Load thất bại');
-    }
-  }
-
-  Future userDelete(User pro) async {
-    final uri = Uri.parse('http://192.168.1.4/flutter/deleteAccount.php');
-    var request = http.MultipartRequest('POST', uri);
-
-    request.fields['user_id'] = pro.user_id;
-
-    var response = await request.send();
-
-    if (response.statusCode == 200) {
-      print("Xóa thành công");
-    } else {
-      print("Xóa thất bại");
-    }
+              },
+            ),
+    );
   }
 }

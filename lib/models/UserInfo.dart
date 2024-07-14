@@ -14,7 +14,7 @@ class UserInfo {
 Future<UserInfo?> getUserInfo(int orderId) async {
   try {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.4/flutter/InformationUser.php?order_id=$orderId'));
+        'http://192.168.30.102/flutter/InformationUser.php?order_id=$orderId'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       if (jsonData['success']) {
@@ -41,7 +41,7 @@ Future<UserInfo?> getUserInfo(int orderId) async {
 Future<int?> getTotalQuantity(int orderId) async {
   try {
     final response = await http.get(
-        Uri.parse('http://192.168.1.4/flutter/quantity.php?order_id=$orderId'));
+        Uri.parse('http://192.168.30.102/flutter/quantity.php?order_id=$orderId'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       if (jsonData['success']) {
@@ -63,7 +63,7 @@ Future<int?> getTotalQuantity(int orderId) async {
 Future<double?> getTotalAmount(int orderId) async {
   try {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.4/flutter/TotalOrder.php?order_id=$orderId'));
+        'http://192.168.30.102/flutter/TotalOrder.php?order_id=$orderId'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       if (jsonData['success']) {
@@ -85,7 +85,7 @@ Future<double?> getTotalAmount(int orderId) async {
 Future<List<Map<String, dynamic>>?> getProducts(int orderId) async {
   try {
     final response = await http
-        .get(Uri.parse('192.168.1.4/flutter/NamePrice.php?order_id=$orderId'));
+        .get(Uri.parse('192.168.30.102/flutter/NamePrice.php?order_id=$orderId'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       if (jsonData['success']) {

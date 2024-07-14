@@ -40,7 +40,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
 
   Future<void> loadCategories() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadCategories.php'));
+        .get(Uri.parse('http://192.168.1.6/flutter/loadCategories.php'));
     if (response.statusCode == 200) {
       setState(() {
         categoryList = json.decode(response.body);
@@ -67,7 +67,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
         backgroundColor: Colors.lightBlue[200],
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context, true);
+            Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back),
         ),
@@ -99,7 +99,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                   ),
                   child: _image == null
                       ? Center(
-                          child: Text('+',
+child: Text('+',
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontWeight: FontWeight.bold,
@@ -174,7 +174,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                   child: Text(
                     "Mô tả",
                     style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -188,7 +188,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0)),
-                focusedBorder: const OutlineInputBorder(
+focusedBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black)),
                 prefixIcon: const Icon(Icons.description_outlined),
               ),
@@ -267,7 +267,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                       price: dongiasp.text,
                       category_id: loai!,
                       description: mota.text,
-                      status: 1.toString()
+status: 1.toString()
                     );
                     productAdd(add);
                     }
@@ -294,7 +294,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
   }
 
   Future productAdd(Product pro) async {
-    final uri = Uri.parse('http://192.168.1.4/flutter/addProduct.php');
+    final uri = Uri.parse('http://192.168.1.6/flutter/addProduct.php');
     var request = http.MultipartRequest('POST', uri);
     request.fields['name'] = pro.name;
     request.fields['price'] = pro.price;
@@ -309,16 +309,14 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
     }
 
     var response = await request.send();
-
+    
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Thêm sản phẩm thành công')),
-      );
+      final res = await http.Response.fromStream(response);
+      final message = jsonDecode(res.body)['message'];
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi khi thêm sản phẩm')),
-      );
+      throw Exception('Lỗi thêm sản phẩm');
     }
   }
 }

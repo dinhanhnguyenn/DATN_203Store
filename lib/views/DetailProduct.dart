@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:app_203store/models/CartProdvider.dart';
 import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/Cart_Page.dart';
 import 'package:app_203store/views/Payment_Page.dart';
@@ -17,24 +16,27 @@ class DetailProduct extends StatefulWidget {
 }
 
 class _DetailProductState extends State<DetailProduct> {
-  List<Map<String, dynamic>> colors = [];
+  var colors = [];
   int? selectedID;
-  List<dynamic> reviews = [];
+  var reviews = [];
 
   var formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ');
 
+  int averageRating = 0; // Change to int for rounded average rating
+
   Future<void> loadColors() async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.4/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
+        'http://192.168.1.6/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       setState(() {
         colors = data
-          .map((item) => {
-                'color_id': item['color_id'],
-                'color_name': item['color_name']
-              })
-          .toList();
+            .map((item) => {
+                  'color_id': item['color_id'],
+                  'color_name': item['color_name'],
+                  'quantity': item['quantity'] ?? 0
+                })
+            .toList();
       });
     } else {
       throw Exception('Load thất bại');
@@ -48,17 +50,43 @@ class _DetailProductState extends State<DetailProduct> {
     loadColors();
   }
 
-  Future<void> addToCart() async {
+  Future<int?> getProId(int productId) async {
+    final url = Uri.parse('http://192.168.1.6/flutter/get_pro_id.php');
+    try {
+      final response = await http.post(url, body: {
+        'product_id': productId.toString(),
+      });
+
+      if (response.statusCode == 200) {
+        final responseBody = response.body;
+        final data = json.decode(responseBody);
+        if (data['status'] == 'success') {
+          return data['pro_id'];
+        } else {
+          print('Error: ${data['message']}');
+          return null;
+        }
+      } else {
+        print('Failed to load data with status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
+  Future<void> addToCart(bool isBuyingNow) async {
     int userId = Provider.of<UserProvider>(context, listen: false).userId;
     if (userId == 0) {
-      // Nếu userId = 0, yêu cầu người dùng đăng nhập
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Vui lòng đăng nhập để thêm vào giỏ hàng')),
       );
       return;
     }
-    int idCart = Provider.of<CartProvider>(context, listen: false).idCart;
-    print("idd cart : $idCart");
+
+    int? proId = await getProId(int.parse(widget.product['product_id']));
+    print('id--------' + proId.toString());
     if (selectedID == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -66,35 +94,50 @@ class _DetailProductState extends State<DetailProduct> {
       );
       return;
     }
-    final url = Uri.parse('http://192.168.1.4/flutter/add_to_cart.php');
+
+    final url = Uri.parse('http://192.168.1.6/flutter/add_to_cart.php');
     try {
       final response = await http.post(url, body: {
-        'product_id': widget.product['product_id'].toString(),
+        'pro_id': proId.toString(),
+        'user_id': userId.toString(),
         'price': widget.product["price"].toString(),
         'quantity': '1',
-        'id_cart': idCart.toString(),
-        'id_color': selectedID.toString()
       });
 
       if (response.statusCode == 200) {
-        final responseBody = response.body;
-        print(
-            'Response body: $responseBody'); // Thêm dòng này để in nội dung phản hồi
+        final responseBody = response.body.trim(); // Xóa các khoảng trắng thừa
+        print('Response body: $responseBody');
+
+        // Kiểm tra và xử lý chuỗi JSON không hợp lệ
+        if (responseBody.startsWith('<')) {
+          throw Exception('Invalid JSON format');
+        }
+
         final data = json.decode(responseBody);
         if (data['status'] == 'success') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Cart()),
-          );
+          if (isBuyingNow) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Payment(
+                  total: double.parse(widget.product['price'].toString()),
+                ),
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Cart()),
+            );
+          }
         } else if (data['status'] == 'exists') {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Sản phẩm đã có trong giỏ hàng')),
           );
         } else {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //       content: Text('Failed to add to cart: ${data['message']}')),
-          // );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Đã xảy ra lỗi, vui lòng thử lại sau')),
+          );
         }
       } else {
         print('Failed to load data with status code: ${response.statusCode}');
@@ -103,67 +146,8 @@ class _DetailProductState extends State<DetailProduct> {
       }
     } catch (e) {
       print('Error: $e');
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Failed to connect')),
-      // );
-    }
-  }
-
-  Future<void> _createOrder() async {
-    int userId = Provider.of<UserProvider>(context, listen: false).userId;
-    if (userId == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Vui lòng đăng nhập để thêm vào giỏ hàng')),
-      );
-      return;
-    }
-
-    double totalPrice = double.parse(widget.product['price'].toString());
-
-    try {
-      final response = await http.post(
-        Uri.parse('http://192.168.1.4/flutter/addOrder.php'),
-        body: {
-          'user_id': userId.toString(),
-          'total': totalPrice.toString(),
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['status'] == 'success') {
-          int orderId = data['order_id'];
-          await http.post(
-            Uri.parse('http://192.168.1.4/flutter/addDetailOrder.php'),
-            body: {
-              'order_id': orderId.toString(),
-              'product_id': widget.product['product_id'].toString(),
-              'quantity': '1',
-              'id_color': selectedID.toString()
-            },
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Payment(
-                      order_id: orderId,
-                      total: totalPrice,
-                    )),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: ${data['message']}')),
-          );
-        }
-      } else {
-        print(
-            'Failed to create order with status code: ${response.statusCode}');
-        throw Exception('Failed to create order');
-      }
-    } catch (e) {
-      print("Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi không xác định')),
+        SnackBar(content: Text('Lỗi kết nối, vui lòng thử lại sau')),
       );
     }
   }
@@ -171,14 +155,14 @@ class _DetailProductState extends State<DetailProduct> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Icon(Icons.phone_in_talk, color: Colors.white),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(90),
+      appBar: AppBar(
+        title: Text(
+          "Chi tiết sản phẩm",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        backgroundColor: Colors.lightBlue[200],
       ),
       bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,7 +171,7 @@ class _DetailProductState extends State<DetailProduct> {
             child: MaterialButton(
               color: const Color(0xFF8E8E8E),
               onPressed: () {
-                addToCart();
+                addToCart(false);
               },
               child: Container(
                   alignment: Alignment.center,
@@ -207,7 +191,7 @@ class _DetailProductState extends State<DetailProduct> {
             child: MaterialButton(
               color: Colors.red,
               onPressed: () {
-                _createOrder();
+                addToCart(true);
               },
               child: Container(
                 alignment: Alignment.center,
@@ -243,23 +227,11 @@ class _DetailProductState extends State<DetailProduct> {
                 Stack(
                   children: [
                     Image.network(
-                      "http://192.168.1.4/flutter/uploads/${widget.product["image"]}",
+                      "http://192.168.1.6/flutter/uploads/${widget.product["image"]}",
                       height: 300,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
-                    Positioned(
-                        top: 8.0,
-                        child: IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.black,
-                            size: 24.0,
-                          ),
-                        )),
                   ],
                 ),
                 const SizedBox(height: 10.0),
@@ -295,7 +267,7 @@ class _DetailProductState extends State<DetailProduct> {
                             crossAxisCount: 3,
                             crossAxisSpacing: 8.0,
                             mainAxisSpacing: 8.0,
-                            childAspectRatio: 2.5,
+                            childAspectRatio: 2,
                           ),
                           itemCount: colors.length,
                           shrinkWrap: true,
@@ -313,11 +285,19 @@ class _DetailProductState extends State<DetailProduct> {
                                         ? Colors.blue
                                         : null,
                                     child: Center(
-                                        child: Text(
-                                      color['color_name'],
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ))));
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text(
+                                              color['color_name'],
+                                              style: TextStyle(
+                                              fontWeight: FontWeight.bold),),
+                                            Text(
+                                              'Kho: ${color['quantity']}',
+                                              style: TextStyle(
+                                              fontWeight: FontWeight.bold),),
+                                          ],
+                                        ))));
                           },
                         ),
                       ),
@@ -344,9 +324,15 @@ class _DetailProductState extends State<DetailProduct> {
                       const SizedBox(
                         height: 20.0,
                       ),
-                      const Text('Đánh Giá Sản Phẩm',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15.0)),
+                      Row(
+                        children: [
+                          const Text('Đánh Giá Sản Phẩm',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15.0)),
+                          SizedBox(width: 10),
+                          buildStarRating(averageRating),
+                        ],
+                      ),
                       Container(
                         width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
@@ -383,27 +369,15 @@ class _DetailProductState extends State<DetailProduct> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text('${review['user_name']}',
+                                              Text('${review['username']}',
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       fontSize: 14)),
                                               SizedBox(height: 4.0),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                      'Đánh Giá: ${review['rating']} sao',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 14)),
-                                                  Icon(Icons.star, size: 14),
-                                                ],
-                                              ),
-                                              SizedBox(height: 4.0),
                                               Text('${review['comment']}',
-                                                  style: TextStyle(
-                                                      fontSize: 14)),
+                                                  style:
+                                                      TextStyle(fontSize: 14)),
                                             ],
                                           ),
                                         ))
@@ -425,7 +399,7 @@ class _DetailProductState extends State<DetailProduct> {
   Future<void> fetchReviewsByProductId(int productId) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/flutter/loadReviewbyProduct.php'),
+        Uri.parse('http://192.168.1.6/flutter/loadReviewbyProduct.php'),
         body: {
           'product_id': productId.toString(),
           'status': '1', // Chỉ lấy những đánh giá có status = 1
@@ -433,17 +407,44 @@ class _DetailProductState extends State<DetailProduct> {
       );
 
       print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        setState(() {
-          reviews = json.decode(response.body);
-        });
+        final dynamic responseData = json.decode(response.body);
+
+        if (responseData is List) {
+          setState(() {
+            reviews = responseData;
+            averageRating = calculateAverageRating(reviews);
+          });
+        } else {
+          throw Exception('Invalid response format: Expected a List');
+        }
       } else {
-        throw Exception('Failed to load reviews');
+        throw Exception('Failed to load reviews: ${response.statusCode}');
       }
     } catch (e) {
       print('Error: $e');
+      // Handle error, show message, etc.
     }
+  }
+
+  int calculateAverageRating(List<dynamic> reviews) {
+    if (reviews.isEmpty) return 0;
+    double sum = reviews.fold(0.0, (total, review) {
+      int rating = int.parse(review['rating'].toString());
+      return total + rating;
+    });
+    return (sum / reviews.length).round();
+  }
+
+  Widget buildStarRating(int rating) {
+    return Row(
+      children: List.generate(5, (index) {
+        return Icon(
+          index < rating ? Icons.star : Icons.star_border,
+          color: Colors.amber,
+        );
+      }),
+    );
   }
 }

@@ -11,8 +11,14 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final List<String> imagelist = [
     "assets/1.jpg",
     "assets/2.jpg",
@@ -24,6 +30,27 @@ class HomeScreen extends StatelessWidget {
   ];
 
   var formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ');
+
+  List<dynamic> topProducts = [];
+
+  Future<void> fetchTopProducts() async {
+    final url = Uri.parse('http://192.168.1.6/flutter/topSell.php');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      setState(() {
+        topProducts = json.decode(response.body);
+      });
+    } else {
+      throw Exception('Failed to load top products');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTopProducts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +159,98 @@ class HomeScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  Text("Sản phẩm bán chạy",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: <Widget>[
+                  for (var product in topProducts)
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DetailProduct(product: product),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          height: 205,
+                          width: 170,
+                            decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2.0
+                            )
+                          ),
+                          child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 110,
+                                    child: ClipRRect(
+                                      child: Image.network(
+                                        "http://192.168.1.6/flutter/uploads/${product["image"]}",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      "${product["name"]}",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${formatCurrency.format(double.parse(product["price"]))}',
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                  Text(
+                                    'Đã bán: ${product["total_quantity_sold"]}',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold
+                                    ),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ),
+                      )
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
                   Text("Tất cả sản phẩm",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -176,10 +295,9 @@ class HomeScreen extends StatelessWidget {
                             );
                           },
                           child: Container(
-                            height: 240,
                             width: 170,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFD9D9D9),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: Colors.black,
@@ -191,21 +309,25 @@ class HomeScreen extends StatelessWidget {
                               child: Column(
                                 children: [
                                   Container(
-                                    height: 100,
+                                    height: 110,
                                     child: ClipRRect(
                                       child: Image.network(
-                                        "http://192.168.1.4/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
-                                  Text(
-                                    "${productList[index]["name"]}",
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                  Expanded(
+                                    child: Text(
+                                      "${productList[index]["name"]}",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    textAlign: TextAlign.start,
                                   ),
                                   Text(
                                     '${formatCurrency.format(double.parse(productList[index]["price"]))}',
@@ -214,29 +336,6 @@ class HomeScreen extends StatelessWidget {
                                       fontWeight: FontWeight.bold
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                                    child: InkWell(
-                                      onTap: (){},
-                                      child: Container(
-                                        height: 30,
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          color: Colors.lightBlue[200],
-                                          border: Border.all(
-                                            color: Colors.black,
-                                            width: 2.0
-                                          )
-                                        ),
-                                        child: const Center(
-                                          child: Text(
-                                            "Thêm vào giỏ hàng"
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
                                 ],
                               ),
                             ),
@@ -247,7 +346,8 @@ class HomeScreen extends StatelessWidget {
                   );
                 }
               },
-            )
+            ),
+            
           ],
         ),
       ),
@@ -256,7 +356,7 @@ class HomeScreen extends StatelessWidget {
 
   Future<List> loadProduct() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.1.6/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

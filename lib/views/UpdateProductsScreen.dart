@@ -42,7 +42,7 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
 
   Future<void> loadCategories() async {
     final response = await http
-        .get(Uri.parse('http://192.168.30.35/flutter/loadCategories.php'));
+        .get(Uri.parse('http://192.168.1.6/flutter/loadCategories.php'));
     if (response.statusCode == 200) {
       setState(() {
         categoryList = json.decode(response.body);
@@ -101,7 +101,7 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                     ),
                     child: _image == null
                         ? Image.network(
-                            "http://192.168.30.35/flutter/uploads/${widget.product["image"]}",
+                            "http://192.168.1.6/flutter/uploads/${widget.product["image"]}",
                             fit: BoxFit.cover,
                             scale: 1.0,
                           )
@@ -246,16 +246,28 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      print("Kết quả: " + loai!);
-                      Product add = Product(
-                          product_id: widget.product['product_id'],
-                          name: tensp.text,
-                          image: _image?.path ?? "",
-                          price: dongiasp.text,
-                          category_id: loai!,
-                          description: mota.text,
-                          status: 1.toString());
-                      productUpdate(add);
+                      if (tensp.text.isEmpty ||
+                          _image!.path.isEmpty ||
+                          dongiasp.text.isEmpty ||
+                          loai!.isEmpty ||
+                          mota.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  'Vui lòng nhập đầy đủ thông tin về sản phẩm')),
+                        );
+                        return;
+                      } else {
+                        Product add = Product(
+                            product_id: widget.product['product_id'],
+                            name: tensp.text,
+                            image: _image?.path ?? "",
+                            price: dongiasp.text,
+                            category_id: loai!,
+                            description: mota.text,
+                            status: 1.toString());
+                        productUpdate(add);
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(180, 60),
@@ -277,9 +289,9 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
         ));
   }
 
-Future productUpdate(Product pro) async {
-  final uri = Uri.parse('http://192.168.1.4/flutter/updateProduct.php');
-  var request = http.MultipartRequest('POST', uri);
+  Future productUpdate(Product pro) async {
+    final uri = Uri.parse('http://192.168.1.6/flutter/updateProduct.php');
+    var request = http.MultipartRequest('POST', uri);
 
     request.fields['product_id'] = pro.product_id;
     request.fields['name'] = pro.name;
@@ -297,17 +309,13 @@ Future productUpdate(Product pro) async {
     var response = await request.send();
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Cập nhật sản phẩm thành công')),
-      );
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ProductManagerScreen()));
+      final res = await http.Response.fromStream(response);
+      final message = jsonDecode(res.body)['message'];
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+      Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi khi cập nhật sản phẩm')),
-      );
+      throw Exception('Lỗi thêm mặt hàng');
     }
   }
-
 }
-

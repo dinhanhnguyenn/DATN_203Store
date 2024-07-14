@@ -6,20 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AddProductDetailScreen extends StatefulWidget {
-  const AddProductDetailScreen({super.key});
-
+  AddProductDetailScreen({super.key, required this.product});
+  final dynamic product;
   @override
   State<AddProductDetailScreen> createState() => _AddProductDetailScreenState();
 }
 
 class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
   ProductDetail newPro = ProductDetail(
-      pro_id: "", product_id: "", color_id: "", quantity: "", status: "");
-
-  var soluong = TextEditingController();
-
-  String? product;
-  List<dynamic> productList = [];
+      pro_id: "",
+      product_id: "",
+      color_id: "",
+      quantity: "",
+      status: "",
+      sell: "");
 
   String? color;
   List<dynamic> colorList = [];
@@ -27,25 +27,12 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-    loadProducts();
     loadColors();
   }
 
-  Future<void> loadProducts() async {
-    final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadProduct.php'));
-    if (response.statusCode == 200) {
-      setState(() {
-        productList = json.decode(response.body);
-      });
-    } else {
-      throw Exception('Load thất bại');
-    }
-  }
-
   Future<void> loadColors() async {
-    final response = await http
-        .get(Uri.parse('http://192.168.1.4/flutter/loadColor.php'));
+    final response =
+        await http.get(Uri.parse('http://192.168.1.6/flutter/loadColor.php'));
     if (response.statusCode == 200) {
       setState(() {
         colorList = json.decode(response.body);
@@ -66,57 +53,13 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
             },
             icon: const Icon(Icons.arrow_back),
           ),
-          title: const Text("Nhập hàng"),
+          title: const Text("Thêm chi tiết sản phẩm"),
         ),
         body: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.all(16.0),
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      "Tên sản phẩm ",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 62.0,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                      10.0), // Set your desired border radius here
-                  border: Border.all(
-                    color: Colors.grey,
-                    width: 1.0,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: productList.isEmpty
-                    ? CircularProgressIndicator()
-                    : DropdownButtonFormField<String>(
-                        value: product,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            product = newValue;
-                          });
-                        },
-                        items: productList
-                            .map<DropdownMenuItem<String>>((dynamic item) {
-                          return DropdownMenuItem<String>(
-                            value: item['product_id'].toString(),
-                            child: Text(item['name']),
-                          );
-                        }).toList(),
-                      ),
-              ),
               const Row(
                 children: [
                   Expanded(
@@ -135,8 +78,7 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
                 width: MediaQuery.of(context).size.width,
                 height: 62.0,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                      10.0), // Set your desired border radius here
+                  borderRadius: BorderRadius.circular(10.0),
                   border: Border.all(
                     color: Colors.grey,
                     width: 1.0,
@@ -161,31 +103,6 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
                         }).toList(),
                       ),
               ),
-              const Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      "Số lượng",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              TextField(
-                controller: soluong,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black)),
-                  prefixIcon: const Icon(Icons.numbers_rounded),
-                ),
-              ),
               const SizedBox(
                 height: 16,
               ),
@@ -194,13 +111,12 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      print(product);
-                      print(color);
                       ProductDetail add = ProductDetail(
                           pro_id: "",
-                          product_id: product!,
+                          product_id: widget.product['product_id'],
                           color_id: color!,
-                          quantity: soluong.text,
+                          quantity: 0.toString(),
+                          sell: 0.toString(),
                           status: 1.toString());
                       productDetailAdd(add);
                     },
@@ -225,26 +141,24 @@ class _AddProductDetailScreenState extends State<AddProductDetailScreen> {
   }
 
   Future productDetailAdd(ProductDetail pro) async {
-    final uri = Uri.parse('http://192.168.1.4/flutter/addProductDetail.php');
+    final uri = Uri.parse('http://192.168.1.6/flutter/addProductDetail.php');
     var request = http.MultipartRequest('POST', uri);
     request.fields['product_id'] = pro.product_id;
     request.fields['color_id'] = pro.color_id;
     request.fields['quantity'] = pro.quantity;
     request.fields['status'] = 1.toString();
+    request.fields['sell'] = pro.sell;
 
     var response = await request.send();
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Thêm sản phẩm thành công')),
-      );
+      final res = await http.Response.fromStream(response);
+      final message = jsonDecode(res.body)['message'];
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi khi thêm sản phẩm')),
-      );
+      throw Exception('Lỗi thêm mặt hàng');
     }
   }
 }
-
-

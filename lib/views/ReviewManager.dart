@@ -21,25 +21,31 @@ class _ReviewManagerState extends State<ReviewManager> {
   Future<void> fetchReviews() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.4/flutter/loadreview.php'),
+        Uri.parse('http://192.168.1.6/flutter/loadreview.php'),
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
       if (response.statusCode == 200) {
+        List<dynamic> fetchedReviews =
+            (json.decode(response.body) as List).map((data) {
+          return {
+            ...data,
+            'review_id': int.parse(data['review_id'].toString()),
+            'status': int.parse(data['status'].toString()),
+            'product_id': int.parse(data['product_id'].toString()),
+            'user_id': int.parse(data['user_id'].toString()),
+          };
+        }).toList();
+
+        // Fetch product names and user emails for all reviews
+        for (var review in fetchedReviews) {
+          String productName = await fetchProductName(review['product_id']);
+          String userEmail = await fetchUserEmail(review['user_id']);
+          review['product_name'] = productName;
+          review['user_email'] = userEmail;
+        }
+
         setState(() {
-          reviews = (json.decode(response.body) as List).map((data) {
-            // Ép kiểu status về số nguyên
-            return {
-              ...data,
-              'review_id': int.parse(data['review_id'].toString()),
-              'status': int.parse(data['status']
-                  .toString()), // Chuyển đổi status thành số nguyên
-              'product_id': int.parse(data['product_id'].toString()),
-              'user_id': int.parse(data['user_id'].toString()),
-            };
-          }).toList();
+          reviews = fetchedReviews;
         });
       } else {
         throw Exception('Failed to load reviews');
@@ -49,10 +55,48 @@ class _ReviewManagerState extends State<ReviewManager> {
     }
   }
 
+  Future<String> fetchProductName(int productId) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'http://192.168.1.6/flutter/getProductName.php?product_id=$productId'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['product_name'];
+      } else {
+        return 'Product not found';
+      }
+    } catch (e) {
+      print('Error: $e');
+      return 'Error fetching product name';
+    }
+  }
+
+  Future<String> fetchUserEmail(int userId) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'http://192.168.1.6/flutter/getUserEmail.php?user_id=$userId'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['email'];
+      } else {
+        return 'User not found';
+      }
+    } catch (e) {
+      print('Error: $e');
+      return 'Error fetching user email';
+    }
+  }
+
   Future<void> updateReviewStatus(int reviewId, int status) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/flutter/updateReviewStatus.php'),
+        Uri.parse('http://192.168.1.6/flutter/updateReviewStatus.php'),
         body: {
           'review_id': reviewId.toString(),
           'status': status.toString(),
@@ -82,6 +126,7 @@ class _ReviewManagerState extends State<ReviewManager> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.lightBlue[200],
         title: Text('Quản lý đánh giá'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -99,19 +144,20 @@ class _ReviewManagerState extends State<ReviewManager> {
                 return Card(
                   margin: EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text('Đánh giá sản phẩm ${review['product_id']}'),
+                    title: Text(
+                        'Đánh giá sản phẩm: ${review['product_name'].toString()}'),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('User ID: ${review['user_id']}'),
-                        Text('Rating: ${review['rating']}'),
-                        Text('Comment: ${review['comment']}'),
-                        Text('Status: ${review['status']}'),
+                        Text('ID Người Dùng: ${review['user_id']}'),
+                        Text('Email Người Dùng: ${review['user_email']}'),
+                        Text('Đánh giá: ${review['rating']}'),
+                        Text('Bình Luận: ${review['comment']}'),
+                        Text('Trạng Thái: ${review['status']}'),
                       ],
                     ),
                     trailing: Switch(
-                      value: review['status'] ==
-                          1, // Chuyển đổi status thành số nguyên
+                      value: review['status'] == 1,
                       onChanged: (value) {
                         int newStatus = value ? 1 : 0;
                         updateReviewStatus(review['review_id'], newStatus);

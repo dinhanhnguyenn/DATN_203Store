@@ -1,5 +1,6 @@
 import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/UpdateProfile.dart';
+import 'package:app_203store/views/changPasswordScreen.dart';
 import 'package:app_203store/views/purchase_history_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -27,7 +28,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> _getUserInfo() async {
     userId = Provider.of<UserProvider>(context, listen: false).userId;
     final response = await http.post(
-      Uri.parse('http://192.168.1.4/flutter/get_user_info.php'),
+      Uri.parse('http://192.168.1.6/flutter/get_user_info.php'),
       body: {'user_id': userId.toString()},
     );
 
@@ -113,6 +114,18 @@ class _AccountScreenState extends State<AccountScreen> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.password),
+              title: Text('Đổi mật khẩu'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChangePasswordScreen(userID: userId),
+                  ),
+                );
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.history),
               title: Text('Lịch Sử Giao Dịch'),
               onTap: () {
@@ -127,15 +140,38 @@ class _AccountScreenState extends State<AccountScreen> {
             Divider(),
             ListTile(
               leading: Icon(Icons.exit_to_app),
-              title: Text('Logout'),
+              title: Text('Đăng xuất'),
               onTap: () {
-                _logout();
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Đăng xuất'),
+                      content: Text('Bạn có muốn đăng xuất không?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('Hủy'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: Text('Đồng ý'),
+                          onPressed: () {
+                            _logout();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
           ],
         ),
       ),
       appBar: AppBar(
+        backgroundColor: Colors.lightBlue[200],
         title: Text('Tài khoản'),
       ),
       body: Column(

@@ -1,4 +1,3 @@
-import 'package:app_203store/models/CartProdvider.dart';
 import 'package:app_203store/views/AccountScreen.dart';
 import 'package:app_203store/views/AddProductDetail.dart';
 import 'package:app_203store/views/AddProductScreen.dart';
@@ -14,6 +13,7 @@ import 'package:app_203store/views/OrderManager.dart';
 import 'package:app_203store/views/Payment_Page.dart';
 import 'package:app_203store/views/Register_Page.dart';
 import 'package:app_203store/views/ReviewManager.dart';
+import 'package:app_203store/views/Statistics_Page.dart';
 import 'package:app_203store/views/UpdateProductsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +24,6 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider(0)),
-        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MyApp(),
     ),
@@ -49,7 +48,8 @@ class MyApp extends StatelessWidget {
         '/cart': (context) => const Cart(),
         '/order': (context) => ManageOrdersPage(),
         '/review': (AboutDialog) => ReviewManager(),
-        '/admin':(context) => AdminScreen()
+        '/admin': (context) => AdminScreen(),
+        '/statistics': (context) => StatisticsPage()
       },
     );
   }

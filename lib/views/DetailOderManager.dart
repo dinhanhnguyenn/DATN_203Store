@@ -1,32 +1,30 @@
 import 'dart:convert';
-import 'package:app_203store/models/UserProvider.dart';
-import 'package:app_203store/views/ReviewOrder.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 
-class DetailOrderUser extends StatefulWidget {
+class DetailOrderManager extends StatefulWidget {
   final int order_id;
   final String status;
-  const DetailOrderUser(
-      {Key? key, required this.order_id, required this.status})
-      : super(key: key);
+
+  const DetailOrderManager({
+    Key? key,
+    required this.order_id,
+    required this.status,
+  }) : super(key: key);
 
   @override
-  State<DetailOrderUser> createState() => _DetailOrderUserState();
+  State<DetailOrderManager> createState() => _DetailOrderManagerState();
 }
 
-class _DetailOrderUserState extends State<DetailOrderUser> {
+class _DetailOrderManagerState extends State<DetailOrderManager> {
   Map<String, dynamic> userDetails = {};
   List<Map<String, dynamic>> orderDetails = [];
   List<Map<String, dynamic>> productDetails = [];
   bool isLoading = true;
-  late int userId;
 
   @override
   void initState() {
     super.initState();
-    userId = Provider.of<UserProvider>(context, listen: false).userId;
     fetchDetails();
   }
 
@@ -135,6 +133,44 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
     }
   }
 
+  Future<void> approveOrder(int index, int proId, int quantity, int id) async {
+    final response = await http.post(
+      Uri.parse('http://192.168.1.6/flutter/approve_order.php'),
+      body: {
+        'pro_id': proId.toString(),
+        'quantity': quantity.toString(),
+        'id': id.toString(),
+      },
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        orderDetails[index]['processed'] = 1;
+      });
+    } else {
+      print('Failed to approve order (${response.statusCode})');
+    }
+  }
+
+  Future<void> cancelOrder(int index, int proId, int quantity, int id) async {
+    final response = await http.post(
+      Uri.parse('http://192.168.1.6/flutter/cancel_order.php'),
+      body: {
+        'pro_id': proId.toString(),
+        'quantity': quantity.toString(),
+        'id': id.toString(),
+      },
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        orderDetails[index]['processed'] = 1;
+      });
+    } else {
+      print('Failed to cancel order (${response.statusCode})');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -168,6 +204,13 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
+                                  'Tên người dùng: ${userDetails["full_name"]}'),
+                              SizedBox(height: 5),
+                              Text('Số điện thoại: ${userDetails["phone"]}'),
+                              SizedBox(height: 5),
+                              Text('Địa chỉ: ${userDetails["address"]}'),
+                              SizedBox(height: 5),
+                              Text(
                                   'Tên sản phẩm: ${productDetail["product_name"]}'),
                               SizedBox(height: 5),
                               Text('Màu sắc: ${productDetail["color_name"]}'),
@@ -177,23 +220,35 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
                               Text('Số lượng: ${orderDetail["quantity"]}'),
                               SizedBox(height: 5),
                               if (widget.status == 'Đã Giao')
-                                ElevatedButton(
-                                  onPressed: () {
-                                    print(orderDetail['pro_id']);
-                                    print(userId);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ReviewOrder(
-                                          user_id: userId,
-                                          pro_id: int.parse(
-                                              orderDetail['pro_id'].toString()),
-                                        ),
+                                orderDetail['processed'] == 1 ||
+                                        orderDetail['processed'] == '1'
+                                    ? Text('Đã duyệt')
+                                    : ElevatedButton(
+                                        onPressed: () {
+                                          approveOrder(
+                                              index,
+                                              pro_id,
+                                              int.parse(
+                                                  orderDetail['quantity']),
+                                              int.parse(orderDetail['id']));
+                                        },
+                                        child: Text('Duyệt'),
                                       ),
-                                    );
-                                  },
-                                  child: Text('Đánh Giá'),
-                                ),
+                              if (widget.status == 'Đã Hủy')
+                                orderDetail['processed'] == 1 ||
+                                        orderDetail['processed'] == '1'
+                                    ? Text('Đã hoàn lại')
+                                    : ElevatedButton(
+                                        onPressed: () {
+                                          cancelOrder(
+                                              index,
+                                              pro_id,
+                                              int.parse(
+                                                  orderDetail['quantity']),
+                                              int.parse(orderDetail['id']));
+                                        },
+                                        child: Text('Hoàn lại'),
+                                      ),
                             ],
                           ),
                         ),

@@ -1,8 +1,7 @@
+import 'package:app_203store/views/DetailOderManager.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import 'detail_order_User.dart';
 
 class ManageOrdersPage extends StatefulWidget {
   @override
@@ -31,7 +30,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
 
     try {
       final response = await http
-          .get(Uri.parse('http://192.168.30.35/flutter/LoadOrderManager.php'));
+          .get(Uri.parse('http://192.168.1.6/flutter/LoadOrderManager.php'));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -55,8 +54,11 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
   void updateOrderStatus(
       int orderId, String newStatus, String newPaymentStatus) async {
     try {
+      print(
+          'Updating order: order_id=$orderId, status=$newStatus, status2=$newPaymentStatus');
+
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/flutter/updateOrderStatus.php'),
+        Uri.parse('http://192.168.1.6/flutter/updateOrderStatus.php'),
         body: {
           'order_id': orderId.toString(),
           'status': newStatus,
@@ -94,73 +96,84 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
         String selectedStatus = order['status'];
         String selectedPaymentStatus = order['status2'];
 
-        return Card(
-          margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          elevation: 4,
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InkWell(
-                  onTap: () {},
-                  child: Text('Mã Đơn Hàng: ${order['order_id']}'),
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailOrderManager(
+                  status: order['status'],
+                  order_id: int.parse(order['order_id']),
                 ),
-                SizedBox(height: 5),
-                Text('Ngày Đặt Hàng: ${order['order_date']}'),
-                Row(
-                  children: [
-                    Text('Trạng Thái Đơn Hàng : '),
-                    DropdownButton<String>(
-                      value: selectedStatus,
-                      items: ['pending', 'shipped', 'delivered', 'cancelled']
-                          .map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            selectedStatus = newValue;
-                          });
-                          updateOrderStatus(
-                              int.parse(order['order_id'].toString()),
-                              newValue,
-                              selectedPaymentStatus);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text('Trạng Thái Thanh Toán : '),
-                    DropdownButton<String>(
-                      value: selectedPaymentStatus,
-                      items: ['Paid', 'Not yet paid'].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            selectedPaymentStatus = newValue;
-                          });
-                          updateOrderStatus(
-                              int.parse(order['order_id'].toString()),
-                              selectedStatus,
-                              newValue);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                Text('Tổng Tiền: ${order['total']}'),
-              ],
+              ),
+            );
+          },
+          child: Card(
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            elevation: 4,
+            child: Padding(
+              padding: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Mã Đơn Hàng: ${order['order_id']}'),
+                  SizedBox(height: 5),
+                  Text('Ngày Đặt Hàng: ${order['order_date']}'),
+                  Row(
+                    children: [
+                      Text('Trạng Thái Đơn Hàng : '),
+                      DropdownButton<String>(
+                        value: selectedStatus,
+                        items: ['Đang chờ', 'Vận Chuyển', 'Đã Giao', 'Đã Hủy']
+                            .map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              selectedStatus = newValue;
+                            });
+                            updateOrderStatus(
+                                int.parse(order['order_id'].toString()),
+                                newValue,
+                                selectedPaymentStatus);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text('Trạng Thái Thanh Toán : '),
+                      DropdownButton<String>(
+                        value: selectedPaymentStatus,
+                        items: ['Thanh Toán', 'Chưa Thanh Toán']
+                            .map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              selectedPaymentStatus = newValue;
+                            });
+                            updateOrderStatus(
+                                int.parse(order['order_id'].toString()),
+                                selectedStatus,
+                                newValue);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  Text('Tổng Tiền: ${order['total']}'),
+                ],
+              ),
             ),
           ),
         );
@@ -172,6 +185,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.lightBlue[200],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -182,10 +196,10 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: 'Đang Chờ'),
-            Tab(text: 'Đang Vận Chuyển'),
-            Tab(text: 'Đã Giao'),
-            Tab(text: 'Đã Hủy'),
+            Tab(icon: Icon(Icons.pending_actions), text: 'Đang Chờ'),
+            Tab(icon: Icon(Icons.local_shipping), text: 'Vận Tải'),
+            Tab(icon: Icon(Icons.done_all), text: 'Đã Giao'),
+            Tab(icon: Icon(Icons.cancel), text: 'Đã Hủy'),
           ],
         ),
       ),
@@ -196,10 +210,10 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
               : TabBarView(
                   controller: _tabController,
                   children: [
-                    buildOrderList(getOrdersByStatus('pending')),
-                    buildOrderList(getOrdersByStatus('shipped')),
-                    buildOrderList(getOrdersByStatus('delivered')),
-                    buildOrderList(getOrdersByStatus('cancelled')),
+                    buildOrderList(getOrdersByStatus('Đang chờ')),
+                    buildOrderList(getOrdersByStatus('Vận Chuyển')),
+                    buildOrderList(getOrdersByStatus('Đã Giao')),
+                    buildOrderList(getOrdersByStatus('Đã Hủy')),
                   ],
                 ),
     );

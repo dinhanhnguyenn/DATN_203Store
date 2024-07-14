@@ -1,11 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ReviewOrder extends StatefulWidget {
-  final int order_id;
+  final int pro_id;
   final int user_id;
 
-  const ReviewOrder({Key? key, required this.order_id, required this.user_id})
+  const ReviewOrder({Key? key, required this.pro_id, required this.user_id})
       : super(key: key);
 
   @override
@@ -18,17 +19,23 @@ class _ReviewOrderState extends State<ReviewOrder> {
   int _rating = 0;
   int product_id = 0;
 
-  Future<void> fetchProductID(int orderId) async {
+  Future<void> fetchProductID(int pro_id) async {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://192.168.1.4/flutter/loadDetail_order.php?order_id=$orderId'),
+            'http://192.168.1.6/flutter/loadproductid.php?pro_id=$pro_id'),
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          product_id = int.parse(response.body.trim());
-        });
+        print('Response body: ${response.body}');
+        var jsonResponse = json.decode(response.body);
+        if (jsonResponse['product_id'] != null) {
+          setState(() {
+            product_id = int.parse(jsonResponse['product_id'].toString());
+          });
+        } else {
+          throw Exception('product_id is null');
+        }
       } else {
         throw Exception('Failed to load product_id');
       }
@@ -40,7 +47,7 @@ class _ReviewOrderState extends State<ReviewOrder> {
   @override
   void initState() {
     super.initState();
-    fetchProductID(widget.order_id);
+    fetchProductID(widget.pro_id);
   }
 
   Future<void> submitReview(int user_id) async {
@@ -48,7 +55,7 @@ class _ReviewOrderState extends State<ReviewOrder> {
     String formattedDate = '${now.year}-${now.month}-${now.day}';
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.4 /flutter/submitReview.php'),
+        Uri.parse('http://192.168.1.6/flutter/submitReview.php'),
         body: {
           'time': formattedDate,
           'user_id': user_id.toString(),
@@ -58,9 +65,13 @@ class _ReviewOrderState extends State<ReviewOrder> {
         },
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đánh giá đã được gửi thành công!')),
+          SnackBar(content: Text(jsonResponse['message'])),
         );
         Navigator.pop(context);
       } else {
@@ -72,6 +83,7 @@ class _ReviewOrderState extends State<ReviewOrder> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Đã xảy ra lỗi trong quá trình gửi đánh giá.')),
       );
+      print('Error: $e');
     }
   }
 
@@ -129,12 +141,24 @@ class _ReviewOrderState extends State<ReviewOrder> {
                     );
                   }),
                 ),
+                if (_rating == 0)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      'Vui lòng chọn đánh giá',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
                 SizedBox(height: 16),
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
+                      if (_formKey.currentState!.validate() && _rating != 0) {
                         submitReview(widget.user_id);
+                      } else if (_rating == 0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Vui lòng chọn đánh giá')),
+                        );
                       }
                     },
                     child: Text('Gửi đánh giá'),

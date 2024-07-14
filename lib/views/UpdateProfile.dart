@@ -130,7 +130,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   Future<void> updateUserInfo(
       String username, String fullName, String phone, String address) async {
     final url = Uri.parse(
-        'http://192.168.1.4/flutter/update_user_info.php'); // Thay đổi thành URL của API PHP của bạn
+        'http://192.168.1.6/flutter/update_user_info.php'); // Thay đổi thành URL của API PHP của bạn
     final response = await http.post(
       url,
       body: {
@@ -147,9 +147,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Cập nhật thông tin thành công')),
       );
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => MainScreen()),
+        (Route<dynamic> route) => false,
       );
     } else {
       // Xử lý khi có lỗi từ phía server

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CardPay extends StatelessWidget {
    CardPay({super.key,required this.image,required this.nameProduct,required this.quantity, required this.price, required this.colorName});
@@ -7,7 +8,7 @@ class CardPay extends StatelessWidget {
   var quantity;
   var price;
   var colorName;
-
+  var formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ');
   @override
   Widget build(BuildContext context) {
     return  Card(
@@ -56,7 +57,7 @@ class CardPay extends StatelessWidget {
                                   : Container(),
                               price != null
                                   ? Text(
-                                      'Giá : $price VNĐ',
+                                      '${formatCurrency.format(double.parse(price))}',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.black,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class InvoiceScreen extends StatefulWidget {
   final double total;
@@ -17,6 +18,7 @@ class InvoiceScreen extends StatefulWidget {
 }
 
 class _InvoiceScreenState extends State<InvoiceScreen> {
+  var formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ');
   Map<String, dynamic>? paymentIntent;
   List<dynamic> _cartItems = [];
   var Nameproduct;
@@ -458,7 +460,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                   child: Text('Phương Thức Thanh Toán'),
                 ),
                 Text(
-                  'Tổng Tiền: ' + widget.total.toString(),
+                  //'Tổng Tiền: ' + widget.total.toString(),
+                  '${formatCurrency.format(widget.total)}',
                   style: TextStyle(
                     fontSize: 16, // Adjust font size if needed
                   ),

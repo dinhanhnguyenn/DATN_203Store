@@ -3,6 +3,7 @@ import 'package:app_203store/views/MainScreen.dart';
 import 'package:app_203store/views/detail_order_User.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class PurchaseHistory extends StatefulWidget {
   final int user_id;
@@ -18,7 +19,7 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
   List<dynamic> orders = [];
   bool isLoading = false;
   String errorMessage = '';
-
+  var formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ');
   @override
   void initState() {
     super.initState();
@@ -123,7 +124,7 @@ class _PurchaseHistoryState extends State<PurchaseHistory>
                   Text('Ngày Đặt Hàng: ${order['order_date']}'),
                   Text('Trạng Thái: ${order['status']}'),
                   Text('Thanh Toán: ${order['status2']}'),
-                  Text('Tổng Tiền: ${order['total']}'),
+                  Text('Tổng Tiền: ${formatCurrency.format(double.parse(order['total']))}'),
                   if (isPending) ...[
                     SizedBox(height: 10),
                     ElevatedButton(

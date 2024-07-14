@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class Cart extends StatefulWidget {
   const Cart({Key? key}) : super(key: key);
@@ -17,7 +18,7 @@ class _CartState extends State<Cart> {
   List<dynamic> _cartItems = [];
   double _totalPrice = 0.0;
   var Nameproduct;
-
+  var formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ');
   @override
   void initState() {
     super.initState();
@@ -242,7 +243,8 @@ class _CartState extends State<Cart> {
                                 : Container(),
                             price != null
                                 ? Text(
-                                    '$price VNĐ',
+                                    //'$price VNĐ',
+                                    '${formatCurrency.format(double.parse(price))}',
                                     style: TextStyle(
                                       fontSize: 10,
                                       color: Colors.black,
@@ -339,7 +341,8 @@ class _CartState extends State<Cart> {
             child: Column(
               children: [
                 Text(
-                  'Tổng cộng: $_totalPrice VNĐ',
+                  // 'Tổng cộng: $_totalPrice VNĐ',
+                  'Tổng cộng: ${formatCurrency.format(_totalPrice)}',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

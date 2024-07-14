@@ -50,11 +50,12 @@ class _DetailProductState extends State<DetailProduct> {
     loadColors();
   }
 
-  Future<int?> getProId(int productId) async {
+  Future<int?> getProId(int productId, int colorId) async {
     final url = Uri.parse('http://192.168.1.5/flutter/get_pro_id.php');
     try {
       final response = await http.post(url, body: {
         'product_id': productId.toString(),
+        'id_color': colorId.toString(),
       });
 
       if (response.statusCode == 200) {
@@ -85,8 +86,6 @@ class _DetailProductState extends State<DetailProduct> {
       return;
     }
 
-    int? proId = await getProId(int.parse(widget.product['product_id']));
-    print('id--------' + proId.toString());
     if (selectedID == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -94,6 +93,10 @@ class _DetailProductState extends State<DetailProduct> {
       );
       return;
     }
+
+    int? proId =
+await getProId(int.parse(widget.product['product_id']), selectedID!);
+    print('id--------' + proId.toString());
 
     final url = Uri.parse('http://192.168.1.5/flutter/add_to_cart.php');
     try {
@@ -181,7 +184,7 @@ class _DetailProductState extends State<DetailProduct> {
                       'Thêm vào giỏ hàng',
                       style: TextStyle(
                           color: Colors.white,
-                          fontWeight: FontWeight.bold,
+fontWeight: FontWeight.bold,
                           fontSize: 15),
                     ),
                   )),
@@ -262,7 +265,7 @@ class _DetailProductState extends State<DetailProduct> {
                       InkWell(
                         child: GridView.builder(
                           physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
+gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
                             crossAxisSpacing: 8.0,
@@ -320,7 +323,7 @@ class _DetailProductState extends State<DetailProduct> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('${widget.product["description"]}')
+Text('${widget.product["description"]}')
                               ],
                             ),
                           )),
@@ -375,7 +378,7 @@ class _DetailProductState extends State<DetailProduct> {
                                               Text('${review['username']}',
                                                   style: TextStyle(
                                                       fontWeight:
-                                                          FontWeight.bold,
+FontWeight.bold,
                                                       fontSize: 14)),
                                               SizedBox(height: 4.0),
                                               Text('${review['comment']}',

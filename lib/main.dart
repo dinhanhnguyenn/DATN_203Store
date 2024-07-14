@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         '/order': (context) => ManageOrdersPage(),
         '/review': (AboutDialog) => ReviewManager(),
         '/admin': (context) => AdminScreen(),
-        '/statistics': (context) => StatisticsPage()
+        '/statistics': (context) => StatisticsPage(),
       },
     );
   }

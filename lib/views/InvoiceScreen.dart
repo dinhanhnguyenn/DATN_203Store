@@ -23,6 +23,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   String fullName = '';
   String address = '';
   String phone = '';
+  String _paymentMethod = 'e_wallet'; // State variable for payment method
 
   Future<void> _getUserInfo() async {
     userId = Provider.of<UserProvider>(context, listen: false).userId;
@@ -420,6 +421,50 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       fontSize: 18, // Example: Adjust font size
                     ),
                   ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Chọn phương thức thanh toán'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              ListTile(
+                                title: Text('Ví điện tử'),
+                                leading: Radio<String>(
+                                  value: 'e_wallet',
+                                  groupValue: _paymentMethod,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _paymentMethod = value!;
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ),
+                              ListTile(
+                                title: Text('Thanh toán khi nhận hàng'),
+                                leading: Radio<String>(
+                                  value: 'cash_on_delivery',
+                                  groupValue: _paymentMethod,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _paymentMethod = value!;
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: Text('Phương Thức Thanh Toán'),
                 ),
                 Text(
                   'Tổng Tiền: ' + widget.total.toString(),

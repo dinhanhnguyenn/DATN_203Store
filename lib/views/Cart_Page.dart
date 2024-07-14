@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:app_203store/models/UserProvider.dart';
+import 'package:app_203store/views/InvoiceScreen.dart';
 import 'package:app_203store/views/Payment_Page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -362,7 +363,7 @@ class _CartState extends State<Cart> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Payment(
+                          builder: (context) => InvoiceScreen(
                             total: _totalPrice,
                           ),
                         ),

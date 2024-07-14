@@ -130,7 +130,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   Future<void> updateUserInfo(
       String username, String fullName, String phone, String address) async {
     final url = Uri.parse(
-        'http://192.168.1.6/flutter/update_user_info.php'); // Thay đổi thành URL của API PHP của bạn
+        'http://192.168.1.5/flutter/update_user_info.php'); // Thay đổi thành URL của API PHP của bạn
     final response = await http.post(
       url,
       body: {

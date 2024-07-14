@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login(BuildContext context) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.6/flutter/login.php'),
+      Uri.parse('http://192.168.1.5/flutter/login.php'),
       body: {
         'email': _emailController.text,
         'password': _passwordController.text,

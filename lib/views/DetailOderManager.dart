@@ -40,7 +40,7 @@ class _DetailOrderManagerState extends State<DetailOrderManager> {
 
     try {
       final response = await http.get(Uri.parse(
-          'http://192.168.1.6/flutter/load_order_user_details.php?order_id=$order_id'));
+          'http://192.168.1.5/flutter/load_order_user_details.php?order_id=$order_id'));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -61,7 +61,7 @@ class _DetailOrderManagerState extends State<DetailOrderManager> {
 
     try {
       final response = await http.get(Uri.parse(
-          'http://192.168.1.6/flutter/get_order_details.php?order_id=$order_id'));
+          'http://192.168.1.5/flutter/get_order_details.php?order_id=$order_id'));
 
       if (response.statusCode == 200) {
         List<dynamic> orderDetailsList = json.decode(response.body);
@@ -98,7 +98,7 @@ class _DetailOrderManagerState extends State<DetailOrderManager> {
   Future<String> fetchColorDetails(int pro_id) async {
     try {
       final response = await http.get(Uri.parse(
-          'http://192.168.1.6/flutter/get_color_name.php?pro_id=$pro_id'));
+          'http://192.168.1.5/flutter/get_color_name.php?pro_id=$pro_id'));
 
       if (response.statusCode == 200) {
         List<dynamic> colorDetailsList = json.decode(response.body);
@@ -119,7 +119,7 @@ class _DetailOrderManagerState extends State<DetailOrderManager> {
   Future<String> fetchProductName(int pro_id) async {
     try {
       final response = await http.get(Uri.parse(
-          'http://192.168.1.6/flutter/get_name_product.php?pro_id=$pro_id'));
+          'http://192.168.1.5/flutter/get_name_product.php?pro_id=$pro_id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -135,7 +135,7 @@ class _DetailOrderManagerState extends State<DetailOrderManager> {
 
   Future<void> approveOrder(int index, int proId, int quantity, int id) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.6/flutter/approve_order.php'),
+      Uri.parse('http://192.168.1.5/flutter/approve_order.php'),
       body: {
         'pro_id': proId.toString(),
         'quantity': quantity.toString(),
@@ -154,7 +154,7 @@ class _DetailOrderManagerState extends State<DetailOrderManager> {
 
   Future<void> cancelOrder(int index, int proId, int quantity, int id) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.6/flutter/cancel_order.php'),
+      Uri.parse('http://192.168.1.5/flutter/cancel_order.php'),
       body: {
         'pro_id': proId.toString(),
         'quantity': quantity.toString(),

@@ -82,7 +82,7 @@ class _CategoriesItemState extends State<CategoriesItem> {
 
 Future<List> loadCategories() async {
   final response = await http
-      .get(Uri.parse('http://192.168.1.6/flutter/loadCategories.php'));
+      .get(Uri.parse('http://192.168.1.5/flutter/loadCategories.php'));
   if (response.statusCode == 200) {
     return json.decode(response.body);
   } else {

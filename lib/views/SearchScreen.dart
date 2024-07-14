@@ -18,7 +18,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> _searchProducts(String searchChar) async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.6/flutter/searchProduct.php?search=$searchChar'));
+        'http://192.168.1.5/flutter/searchProduct.php?search=$searchChar'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -97,7 +97,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
                                     child: Image.network(
-                                      "http://192.168.1.6/flutter/uploads/${_products[index]["image"]}",
+                                      "http://192.168.1.5/flutter/uploads/${_products[index]["image"]}",
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -138,7 +138,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<List> loadProduct() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.6/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.1.5/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

@@ -73,7 +73,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                     height: 110,
                                     child: ClipRRect(
                                       child: Image.network(
-                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.5/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -116,7 +116,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   Future<List> loadProductByCategory() async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.6/flutter/loadProductByCategory.php?category_id=${widget.category["category_id"]}'));
+        'http://192.168.1.5/flutter/loadProductByCategory.php?category_id=${widget.category["category_id"]}'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

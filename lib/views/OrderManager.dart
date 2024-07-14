@@ -30,7 +30,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
 
     try {
       final response = await http
-          .get(Uri.parse('http://192.168.1.6/flutter/LoadOrderManager.php'));
+          .get(Uri.parse('http://192.168.1.5/flutter/LoadOrderManager.php'));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -58,7 +58,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage>
           'Updating order: order_id=$orderId, status=$newStatus, status2=$newPaymentStatus');
 
       final response = await http.post(
-        Uri.parse('http://192.168.1.6/flutter/updateOrderStatus.php'),
+        Uri.parse('http://192.168.1.5/flutter/updateOrderStatus.php'),
         body: {
           'order_id': orderId.toString(),
           'status': newStatus,

@@ -42,7 +42,7 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
 
   Future<void> loadCategories() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.6/flutter/loadCategories.php'));
+        .get(Uri.parse('http://192.168.1.5/flutter/loadCategories.php'));
     if (response.statusCode == 200) {
       setState(() {
         categoryList = json.decode(response.body);
@@ -101,7 +101,7 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                     ),
                     child: _image == null
                         ? Image.network(
-                            "http://192.168.1.6/flutter/uploads/${widget.product["image"]}",
+                            "http://192.168.1.5/flutter/uploads/${widget.product["image"]}",
                             fit: BoxFit.cover,
                             scale: 1.0,
                           )
@@ -290,7 +290,7 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
   }
 
   Future productUpdate(Product pro) async {
-    final uri = Uri.parse('http://192.168.1.6/flutter/updateProduct.php');
+    final uri = Uri.parse('http://192.168.1.5/flutter/updateProduct.php');
     var request = http.MultipartRequest('POST', uri);
 
     request.fields['product_id'] = pro.product_id;

@@ -23,7 +23,7 @@ class _AccountManagerScreenState extends State<AccountManagerScreen> {
   Future<void> fetchUsers() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.6/flutter/loadUser.php'),
+        Uri.parse('http://192.168.1.5/flutter/loadUser.php'),
       );
 
       print('Response status: ${response.statusCode}');
@@ -51,7 +51,7 @@ class _AccountManagerScreenState extends State<AccountManagerScreen> {
   Future<void> updateReviewStatus(int userId, int status) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.6/flutter/updateAccountStatus.php'),
+        Uri.parse('http://192.168.1.5/flutter/updateAccountStatus.php'),
         body: {
           'user_id': userId.toString(),
           'status': status.toString(),

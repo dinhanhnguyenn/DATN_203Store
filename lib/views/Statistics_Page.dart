@@ -23,7 +23,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   Future<void> fetchDailyData() async {
     final response =
-        await http.get(Uri.parse('http://192.168.1.6/flutter/revenue.php'));
+        await http.get(Uri.parse('http://192.168.1.5/flutter/revenue.php'));
 
     if (response.statusCode == 200) {
       final List<dynamic> responseData = json.decode(response.body);
@@ -46,7 +46,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   Future<void> fetchMonthlyData() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.6/flutter/revenueMonth.php'));
+        .get(Uri.parse('http://192.168.1.5/flutter/revenueMonth.php'));
 
     if (response.statusCode == 200) {
       final List<dynamic> responseData = json.decode(response.body);

@@ -42,7 +42,7 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
 
     try {
       final response = await http.get(Uri.parse(
-          'http://192.168.1.6/flutter/load_order_user_details.php?order_id=$order_id'));
+          'http://192.168.1.5/flutter/load_order_user_details.php?order_id=$order_id'));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -63,7 +63,7 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
 
     try {
       final response = await http.get(Uri.parse(
-          'http://192.168.1.6/flutter/get_order_details.php?order_id=$order_id'));
+          'http://192.168.1.5/flutter/get_order_details.php?order_id=$order_id'));
 
       if (response.statusCode == 200) {
         List<dynamic> orderDetailsList = json.decode(response.body);
@@ -100,7 +100,7 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
   Future<String> fetchColorDetails(int pro_id) async {
     try {
       final response = await http.get(Uri.parse(
-          'http://192.168.1.6/flutter/get_color_name.php?pro_id=$pro_id'));
+          'http://192.168.1.5/flutter/get_color_name.php?pro_id=$pro_id'));
 
       if (response.statusCode == 200) {
         List<dynamic> colorDetailsList = json.decode(response.body);
@@ -121,7 +121,7 @@ class _DetailOrderUserState extends State<DetailOrderUser> {
   Future<String> fetchProductName(int pro_id) async {
     try {
       final response = await http.get(Uri.parse(
-          'http://192.168.1.6/flutter/get_name_product.php?pro_id=$pro_id'));
+          'http://192.168.1.5/flutter/get_name_product.php?pro_id=$pro_id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

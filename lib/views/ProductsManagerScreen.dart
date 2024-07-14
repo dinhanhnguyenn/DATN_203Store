@@ -97,7 +97,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                                 width: 100,
                                 height: 100,
                                 child: Image.network(
-                                    "http://192.168.1.6/flutter/uploads/${productListByAdmin[index]["image"]}",
+                                    "http://192.168.1.5/flutter/uploads/${productListByAdmin[index]["image"]}",
                                     fit: BoxFit.cover),
                               ),
                             ),
@@ -280,7 +280,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
   }
 
   Future productDelete(Product pro) async {
-    final uri = Uri.parse('http://192.168.1.6/flutter/deleteProduct.php');
+    final uri = Uri.parse('http://192.168.1.5/flutter/deleteProduct.php');
     var request = http.MultipartRequest('POST', uri);
 
     request.fields['product_id'] = pro.product_id;
@@ -299,7 +299,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
 
   Future<List> loadProductByAdmin() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.6/flutter/loadProductByAdmin.php'));
+        .get(Uri.parse('http://192.168.1.5/flutter/loadProductByAdmin.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

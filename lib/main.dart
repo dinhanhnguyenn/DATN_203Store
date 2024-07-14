@@ -15,10 +15,13 @@ import 'package:app_203store/views/ReviewManager.dart';
 import 'package:app_203store/views/Statistics_Page.dart';
 import 'package:app_203store/views/UpdateProductsScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'package:app_203store/models/UserProvider.dart';
 
 void main() {
+  Stripe.publishableKey =
+      "pk_test_51PcUEvRrmOJmSsuH8Cw95dL1TlW5P3X5WRNNSJftRUSTM3Gc2rJJtj6PNhvcyYXBauqavkfcy5ohbbbFzuLSEl2r00QC4oyBHz";
   runApp(
     MultiProvider(
       providers: [

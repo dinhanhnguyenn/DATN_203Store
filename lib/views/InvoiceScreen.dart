@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:app_203store/models/UserProvider.dart';
+import 'package:app_203store/models/cardpay.dart';
 import 'package:app_203store/views/MainScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
@@ -16,6 +17,7 @@ class InvoiceScreen extends StatefulWidget {
 }
 
 class _InvoiceScreenState extends State<InvoiceScreen> {
+  Map<String, dynamic>? paymentIntent;
   List<dynamic> _cartItems = [];
   var Nameproduct;
   late int userId;
@@ -24,11 +26,67 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   String address = '';
   String phone = '';
   String _paymentMethod = 'e_wallet'; // State variable for payment method
+ Future<void> makePayment() async {
+    try {
+      paymentIntent = await createPaymentIntent('100000', 'VND');
+
+      var gpay = PaymentSheetGooglePay(
+          merchantCountryCode: "VN", currencyCode: "VND", testEnv: true);
+
+      //STEP 2: Initialize Payment Sheet
+      await Stripe.instance
+          .initPaymentSheet(
+              paymentSheetParameters: SetupPaymentSheetParameters(
+                  paymentIntentClientSecret: paymentIntent![
+                      'client_secret'], //Gotten from payment intent
+                  style: ThemeMode.light,
+                  merchantDisplayName: 'Abhi',
+                  googlePay: gpay))
+          .then((value) {});
+
+      //STEP 3: Display Payment sheet
+      displayPaymentSheet();
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  displayPaymentSheet() async {
+    try {
+      await Stripe.instance.presentPaymentSheet().then((value) {
+        print("Payment Successfully");
+      });
+    } catch (e) {
+      print('$e');
+    }
+  }
+
+  createPaymentIntent(String amount, String currency) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': amount,
+        'currency': currency,
+      };
+
+      var response = await http.post(
+        Uri.parse('https://api.stripe.com/v1/payment_intents'),
+        headers: {
+          'Authorization':
+              'Bearer sk_test_51PcUEvRrmOJmSsuHO91sRAaI8dhIZkr07FzzELIg6tH8cs65uZgU6WTFoOtyNURPofKZWQNzaGFKkohiSCVVKzpI00aZTFWKsD',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body,
+      );
+      return json.decode(response.body);
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
 
   Future<void> _getUserInfo() async {
     userId = Provider.of<UserProvider>(context, listen: false).userId;
     final response = await http.post(
-      Uri.parse('http://192.168.1.6/flutter/get_user_info.php'),
+      Uri.parse('http://192.168.1.5/flutter/get_user_info.php'),
       body: {'user_id': userId.toString()},
     );
 
@@ -80,7 +138,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   Future<List<dynamic>> fetchCartItems(int userId) async {
-    final String apiUrl = 'http://192.168.1.6/flutter/load_cart_items.php';
+    final String apiUrl = 'http://192.168.1.5/flutter/load_cart_items.php';
 
     try {
       final response = await http.get(Uri.parse('$apiUrl?user_id=$userId'));
@@ -114,7 +172,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   Future<String?> fetchData(int proId) async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.6/flutter/get_product_info.php?pro_id=$proId'));
+        'http://192.168.1.5/flutter/get_product_info.php?pro_id=$proId'));
 
     if (response.statusCode == 200) {
       // Nếu kết nối thành công và có dữ liệu trả về
@@ -136,7 +194,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   Future<dynamic> fetchProductDetails(int proId) async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.6/flutter/get_product_details.php?pro_id=$proId'));
+        'http://192.168.1.5/flutter/get_product_details.php?pro_id=$proId'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -148,7 +206,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   Future<void> _deleteItemCart(String cartDetailId) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.6/flutter/update_status.php'),
+      Uri.parse('http://192.168.1.5/flutter/update_status.php'),
       body: {'cartz_detail_id': cartDetailId},
     );
 
@@ -179,7 +237,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.6/flutter/addOrder.php'),
+        Uri.parse('http://192.168.1.5/flutter/addOrder.php'),
         body: {
           'user_id': userId.toString(),
           'total': totalPrice.toString(),
@@ -198,7 +256,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
               continue;
             }
             final detailResponse = await http.post(
-              Uri.parse('http://192.168.1.6/flutter/addDetailOrder.php'),
+              Uri.parse('http://192.168.1.5/flutter/addDetailOrder.php'),
               body: {
                 'order_id': orderId.toString(),
                 'pro_id': item['pro_id'].toString(),
@@ -281,74 +339,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                   String? image = item['image']?.toString();
                   String? cartDetailId = item['cartz_detail_id']?.toString();
                   String? nameProduct = item['name']?.toString();
-                  return Card(
-                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    elevation: 4,
-                    child: Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          image != null
-                              ? Image.network(
-                                  'http://192.168.1.6/flutter/uploads/$image',
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(),
-                          SizedBox(width: 5),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              nameProduct != null
-                                  ? Text(
-                                      '$nameProduct',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                      ),
-                                    )
-                                  : Container(),
-                              // Display color name if available
-                            ],
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              quantity != null
-                                  ? Text(
-                                      'Số lượng : $quantity',
-                                      style: TextStyle(fontSize: 12),
-                                    )
-                                  : Container(),
-                              price != null
-                                  ? Text(
-                                      'Giá : $price VNĐ',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.black,
-                                      ),
-                                    )
-                                  : Container(),
-                              colorName != null
-                                  ? Text(
-                                      'Màu : $colorName',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.black,
-                                      ),
-                                    )
-                                  : Container()
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  return CardPay(image: image, nameProduct: nameProduct, quantity: quantity, price: price, colorName: colorName);
                 },
               ),
             ),
@@ -491,32 +482,36 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                     ),
                     backgroundColor: Colors.lightBlue[200],
                   ),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text("Xác nhận Mua Hàng"),
-                          content:
-                              Text("Bạn có chắc mua các sản phẩm này không?"),
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text("Hủy"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            TextButton(
-                              child: Text("Mua"),
-                              onPressed: () {
-                                _createOrder();
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                  onPressed: ()async {
+                  print(_paymentMethod);
+                    if(_paymentMethod =="e_wallet"){
+await makePayment();
+                    }
+                    // showDialog(
+                    //   context: context,
+                    //   builder: (BuildContext context) {
+                    //     return AlertDialog(
+                    //       title: Text("Xác nhận Mua Hàng"),
+                    //       content:
+                    //           Text("Bạn có chắc mua các sản phẩm này không?"),
+                    //       actions: <Widget>[
+                    //         TextButton(
+                    //           child: Text("Hủy"),
+                    //           onPressed: () {
+                    //             Navigator.of(context).pop();
+                    //           },
+                    //         ),
+                    //         TextButton(
+                    //           child: Text("Mua"),
+                    //           onPressed: () {
+                    //             _createOrder();
+                    //             Navigator.of(context).pop();
+                    //           },
+                    //         ),
+                    //       ],
+                    //     );
+                    //   },
+                    // );
                   },
                   child: const Text(
                     "Mua Hàng",
@@ -530,4 +525,5 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       ),
     );
   }
+  
 }

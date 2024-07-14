@@ -20,7 +20,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   Future<void> _changePassword() async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.6/flutter/changePassword.php'),
+      Uri.parse('http://192.168.1.5/flutter/changePassword.php'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

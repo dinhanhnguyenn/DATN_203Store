@@ -33,7 +33,7 @@ class _CartState extends State<Cart> {
   }
 
   Future<List<dynamic>> fetchCartItems(int userId) async {
-    final String apiUrl = 'http://192.168.1.6/flutter/load_cart_items.php';
+    final String apiUrl = 'http://192.168.1.5/flutter/load_cart_items.php';
 
     try {
       final response = await http.get(Uri.parse('$apiUrl?user_id=$userId'));
@@ -67,7 +67,7 @@ class _CartState extends State<Cart> {
 
   Future<dynamic> fetchProductDetails(int proId) async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.6/flutter/get_product_details.php?pro_id=$proId'));
+        'http://192.168.1.5/flutter/get_product_details.php?pro_id=$proId'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -95,7 +95,7 @@ class _CartState extends State<Cart> {
 
   Future<void> _deleteItemCart(String cartDetailId) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.6/flutter/update_status.php'),
+      Uri.parse('http://192.168.1.5/flutter/update_status.php'),
       body: {'cartz_detail_id': cartDetailId},
     );
 
@@ -120,7 +120,7 @@ class _CartState extends State<Cart> {
 
   Future<void> _updateQuantity(String cartDetailId, int newQuantity) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.6/flutter/update_quantity.php'),
+      Uri.parse('http://192.168.1.5/flutter/update_quantity.php'),
       body: {
         'cartz_detail_id': cartDetailId,
         'new_quantity': newQuantity.toString(),
@@ -153,7 +153,7 @@ class _CartState extends State<Cart> {
 
   Future<String?> fetchData(int proId) async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.6/flutter/get_product_info.php?pro_id=$proId'));
+        'http://192.168.1.5/flutter/get_product_info.php?pro_id=$proId'));
 
     if (response.statusCode == 200) {
       // Nếu kết nối thành công và có dữ liệu trả về
@@ -212,7 +212,7 @@ class _CartState extends State<Cart> {
                       children: [
                         image != null
                             ? Image.network(
-                                'http://192.168.1.6/flutter/uploads/$image',
+                                'http://192.168.1.5/flutter/uploads/$image',
                                 width: 50,
                                 height: 50,
                                 fit: BoxFit.cover,

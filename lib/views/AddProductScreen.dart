@@ -40,7 +40,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
 
   Future<void> loadCategories() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.6/flutter/loadCategories.php'));
+        .get(Uri.parse('http://192.168.1.5/flutter/loadCategories.php'));
     if (response.statusCode == 200) {
       setState(() {
         categoryList = json.decode(response.body);
@@ -294,7 +294,7 @@ status: 1.toString()
   }
 
   Future productAdd(Product pro) async {
-    final uri = Uri.parse('http://192.168.1.6/flutter/addProduct.php');
+    final uri = Uri.parse('http://192.168.1.5/flutter/addProduct.php');
     var request = http.MultipartRequest('POST', uri);
     request.fields['name'] = pro.name;
     request.fields['price'] = pro.price;

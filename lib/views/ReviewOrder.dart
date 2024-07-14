@@ -23,7 +23,7 @@ class _ReviewOrderState extends State<ReviewOrder> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://192.168.1.6/flutter/loadproductid.php?pro_id=$pro_id'),
+            'http://192.168.1.5/flutter/loadproductid.php?pro_id=$pro_id'),
       );
 
       if (response.statusCode == 200) {
@@ -55,7 +55,7 @@ class _ReviewOrderState extends State<ReviewOrder> {
     String formattedDate = '${now.year}-${now.month}-${now.day}';
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.6/flutter/submitReview.php'),
+        Uri.parse('http://192.168.1.5/flutter/submitReview.php'),
         body: {
           'time': formattedDate,
           'user_id': user_id.toString(),

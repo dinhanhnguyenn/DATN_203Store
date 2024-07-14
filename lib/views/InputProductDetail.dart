@@ -29,7 +29,7 @@ class _InputProductDetailState extends State<InputProductDetail> {
 
   Future<void> loadColors() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.6/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
+        .get(Uri.parse('http://192.168.1.5/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       setState(() {
         colorList = json.decode(response.body);
@@ -162,7 +162,7 @@ class _InputProductDetailState extends State<InputProductDetail> {
   }
 
   Future<void> inputProduct(String product_id, String color_id, String quantity) async {
-  final uri = Uri.parse('http://192.168.1.6/flutter/updateProductDetail.php');
+  final uri = Uri.parse('http://192.168.1.5/flutter/updateProductDetail.php');
   var request = http.MultipartRequest('POST', uri);
 
     request.fields['product_id'] = product_id;

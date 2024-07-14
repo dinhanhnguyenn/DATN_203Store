@@ -22,7 +22,7 @@ class _InfoProductState extends State<InfoProduct> {
 
   Future<void> loadColors() async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.6/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
+        'http://192.168.1.5/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       setState(() {
@@ -67,7 +67,7 @@ class _InfoProductState extends State<InfoProduct> {
                 Stack(
                   children: [
                     Image.network(
-                      "http://192.168.1.6/flutter/uploads/${widget.product["image"]}",
+                      "http://192.168.1.5/flutter/uploads/${widget.product["image"]}",
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),

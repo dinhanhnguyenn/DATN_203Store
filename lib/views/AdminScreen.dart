@@ -219,7 +219,7 @@ physics: const NeverScrollableScrollPhysics(),
                                     height: 110,
                                     child: ClipRRect(
                                       child: Image.network(
-                                        "http://192.168.1.6/flutter/uploads/${productList[index]["image"]}",
+                                        "http://192.168.1.5/flutter/uploads/${productList[index]["image"]}",
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -262,7 +262,7 @@ physics: const NeverScrollableScrollPhysics(),
 
   Future<List> loadProduct() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.6/flutter/loadProduct.php'));
+        .get(Uri.parse('http://192.168.1.5/flutter/loadProduct.php'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

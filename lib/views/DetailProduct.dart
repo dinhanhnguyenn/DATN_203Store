@@ -26,7 +26,7 @@ class _DetailProductState extends State<DetailProduct> {
 
   Future<void> loadColors() async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.6/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
+        'http://192.168.1.5/flutter/loadColorByProductDetail.php?id=${widget.product["product_id"]}'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       setState(() {
@@ -51,7 +51,7 @@ class _DetailProductState extends State<DetailProduct> {
   }
 
   Future<int?> getProId(int productId) async {
-    final url = Uri.parse('http://192.168.1.6/flutter/get_pro_id.php');
+    final url = Uri.parse('http://192.168.1.5/flutter/get_pro_id.php');
     try {
       final response = await http.post(url, body: {
         'product_id': productId.toString(),
@@ -95,7 +95,7 @@ class _DetailProductState extends State<DetailProduct> {
       return;
     }
 
-    final url = Uri.parse('http://192.168.1.6/flutter/add_to_cart.php');
+    final url = Uri.parse('http://192.168.1.5/flutter/add_to_cart.php');
     try {
       final response = await http.post(url, body: {
         'pro_id': proId.toString(),
@@ -227,7 +227,7 @@ class _DetailProductState extends State<DetailProduct> {
                 Stack(
                   children: [
                     Image.network(
-                      "http://192.168.1.6/flutter/uploads/${widget.product["image"]}",
+                      "http://192.168.1.5/flutter/uploads/${widget.product["image"]}",
                       height: 300,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -402,7 +402,7 @@ class _DetailProductState extends State<DetailProduct> {
   Future<void> fetchReviewsByProductId(int productId) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.6/flutter/loadReviewbyProduct.php'),
+        Uri.parse('http://192.168.1.5/flutter/loadReviewbyProduct.php'),
         body: {
           'product_id': productId.toString(),
           'status': '1', // Chỉ lấy những đánh giá có status = 1

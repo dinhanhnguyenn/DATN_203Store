@@ -10,7 +10,6 @@ import 'package:app_203store/views/Login_Page.dart';
 import 'package:app_203store/views/MainScreen.dart';
 import 'package:app_203store/views/NotificationsScreen.dart';
 import 'package:app_203store/views/OrderManager.dart';
-import 'package:app_203store/views/Payment_Page.dart';
 import 'package:app_203store/views/Register_Page.dart';
 import 'package:app_203store/views/ReviewManager.dart';
 import 'package:app_203store/views/Statistics_Page.dart';

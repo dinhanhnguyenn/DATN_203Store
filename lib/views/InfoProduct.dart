@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/Cart_Page.dart';
-import 'package:app_203store/views/Payment_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';

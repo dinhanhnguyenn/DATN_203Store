@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:app_203store/models/UserProvider.dart';
 import 'package:app_203store/views/Cart_Page.dart';
-import 'package:app_203store/views/Payment_Page.dart';
+import 'package:app_203store/views/InvoiceScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -119,7 +119,7 @@ class _DetailProductState extends State<DetailProduct> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => Payment(
+                builder: (context) => InvoiceScreen(
                   total: double.parse(widget.product['price'].toString()),
                 ),
               ),
@@ -286,18 +286,21 @@ class _DetailProductState extends State<DetailProduct> {
                                         : null,
                                     child: Center(
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Text(
-                                              color['color_name'],
-                                              style: TextStyle(
-                                              fontWeight: FontWeight.bold),),
-                                            Text(
-                                              'Kho: ${color['quantity']}',
-                                              style: TextStyle(
-                                              fontWeight: FontWeight.bold),),
-                                          ],
-                                        ))));
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Text(
+                                          color['color_name'],
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          'Kho: ${color['quantity']}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ))));
                           },
                         ),
                       ),
